@@ -2878,7 +2878,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             if (autoGenCheckbox && autoGenCheckbox.checked) {
                 // Wait a moment for preview to render, then auto-generate images
                 setTimeout(() => {
-                    autoGeneratePlaceholderImages();
+                    autoGeneratePlaceholderImages(true); // Pass true to skip confirmation
                 }, 1000);
             }
         }
@@ -5170,12 +5170,14 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             }
         }
         
-        async function autoGeneratePlaceholderImages() {
+        async function autoGeneratePlaceholderImages(skipConfirm = false) {
             const imageGenModel = document.getElementById('imageGenModelSelect').value; // Always set
             const apiKey = document.getElementById('apiKey').value;
             
             if (!apiKey) {
-                alert('Please enter your OpenRouter API key first');
+                if (!skipConfirm) {
+                    alert('Please enter your OpenRouter API key first');
+                }
                 return;
             }
             
@@ -5185,12 +5187,17 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             const placeholderImages = tempDiv.querySelectorAll('img[src*="placeholder.com"], img[data-image-prompt]');
             
             if (placeholderImages.length === 0) {
-                alert('No placeholder images found in the current HTML');
+                if (!skipConfirm) {
+                    alert('No placeholder images found in the current HTML');
+                }
                 return;
             }
             
-            const confirmGenerate = confirm(`Found ${placeholderImages.length} placeholder image(s). Generate real images for all of them?`);
-            if (!confirmGenerate) return;
+            // Skip confirmation if auto-generating
+            if (!skipConfirm) {
+                const confirmGenerate = confirm(`Found ${placeholderImages.length} placeholder image(s). Generate real images for all of them?`);
+                if (!confirmGenerate) return;
+            }
             
             showMessage('assistant', `🎨 Starting to generate ${placeholderImages.length} images...`);
             
