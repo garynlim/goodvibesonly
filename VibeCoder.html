@@ -4003,7 +4003,6 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 if (!elementPickerActive && !selectedElement) {
                     elementPickerActive = true;
                     enableElementPicker();
-                    showToast('Click on any element in the preview to select it for editing', 4000);
                 }
                 textarea.placeholder = selectedElement ? 
                     `Describe how to edit the selected ${selectedElement.tag}...` :
@@ -4049,11 +4048,12 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 top: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                background: linear-gradient(135deg, #667eea, #764ba2);
+                background: #09090b;
                 color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+                padding: 10px 16px;
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                border: 1px solid #27272a;
                 z-index: 100001;
                 font-size: 14px;
                 font-weight: 500;
@@ -4187,6 +4187,26 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             const previewFrame = document.getElementById('previewFrame');
             const iframeDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
             
+            // Show toast with ESC shortcut info
+            showToast('Click an element to select it • Press ESC to cancel', 4000);
+            
+            // Add ESC key listener
+            const escapeHandler = (e) => {
+                if (e.key === 'Escape' && elementPickerActive) {
+                    e.preventDefault();
+                    elementPickerActive = false;
+                    const btn = document.getElementById('elementPickerBtn');
+                    btn.classList.remove('active');
+                    disableElementPicker();
+                    showToast('Selection cancelled', 2000);
+                    document.removeEventListener('keydown', escapeHandler);
+                }
+            };
+            document.addEventListener('keydown', escapeHandler);
+            
+            // Store the handler so we can remove it later
+            window.elementPickerEscapeHandler = escapeHandler;
+            
             // Create overlay
             let overlay = iframeDoc.getElementById('elementPickerOverlay');
             if (!overlay) {
@@ -4213,8 +4233,8 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                     position: relative;
                 }
                 body *:hover {
-                    outline: 2px dashed #667eea !important;
-                    background-color: rgba(102, 126, 234, 0.1) !important;
+                    outline: 2px dashed #09090b !important;
+                    background-color: rgba(9, 9, 11, 0.05) !important;
                 }
                 .element-selected {
                     position: relative !important;
@@ -4263,6 +4283,12 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
         function disableElementPicker() {
             const previewFrame = document.getElementById('previewFrame');
             const iframeDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+            
+            // Remove ESC key listener if it exists
+            if (window.elementPickerEscapeHandler) {
+                document.removeEventListener('keydown', window.elementPickerEscapeHandler);
+                delete window.elementPickerEscapeHandler;
+            }
             
             // Remove overlay
             const overlay = iframeDoc.getElementById('elementPickerOverlay');
