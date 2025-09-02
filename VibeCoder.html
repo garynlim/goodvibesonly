@@ -2227,7 +2227,7 @@ Each task should be specific and actionable. Do not generate any code yet. Focus
                         cssClassContext = `\n\nIMPORTANT: Reuse these existing CSS classes where appropriate:\n${uniqueClasses.join(', ')}\n`;
                     }
                 }
-                contextMessage = `[ADD MODE - Append to existing content]\n${input}${cssClassContext}\n\nCurrent HTML:\n${currentHTML}\n\nCurrent CSS:\n${currentCSS}${memoryContext}`;
+                contextMessage = `[ADD MODE - Create NEW content only]\n${input}${cssClassContext}\n\nIMPORTANT: Return ONLY the new HTML and CSS to be added. Do NOT include existing content.\n\nExisting HTML structure for context:\n${currentHTML ? currentHTML.substring(0, 500) + '...' : 'None'}\n\nExisting CSS classes you can reuse:\n${cssClassContext}${memoryContext}`;
             } else if (currentMode === 'reference' && referenceData) {
                 contextMessage = `[REFERENCE MODE - Recreate similar design]\n${input}\n\nReference URL: ${referenceData.url}\n\n`;
                 if (referenceData.html) {
@@ -2264,7 +2264,7 @@ Each task should be specific and actionable. Do not generate any code yet. Focus
                                 content: getSystemPromptWithBrandGuidelines() + `
 
 CRITICAL MODE HANDLING:
-- [ADD MODE]: When you see "[ADD MODE]", APPEND new content to the existing HTML/CSS. Include ALL existing code PLUS the new additions.
+- [ADD MODE]: When you see "[ADD MODE]", return ONLY the NEW content to be added. Do NOT include any existing HTML/CSS - just the new elements you're creating.
 - [EDIT MODE]: When you see "[EDIT MODE]", MODIFY only the specified element while preserving everything else. Include the COMPLETE HTML/CSS with your edits applied.
 - [REFERENCE MODE]: When you see "[REFERENCE MODE]", CREATE a similar design inspired by the reference website. Analyze the structure and style, but create your own modern interpretation. Don't copy exactly - improve upon it with modern design patterns.
 
@@ -2275,16 +2275,18 @@ Brief description of what you created or modified
 
 [HTML]
 \`\`\`html
-(complete HTML code - either with additions in ADD mode or modifications in EDIT mode)
+(In ADD MODE: ONLY new HTML to be added, no existing content)
+(In EDIT MODE: complete HTML with modifications)
 \`\`\`
 
 [CSS]
 \`\`\`css
-(complete CSS code - include all existing styles plus any new/modified styles)
+(In ADD MODE: ONLY new CSS for the new elements, no existing styles)
+(In EDIT MODE: complete CSS with modifications)
 \`\`\`
 
 CRITICAL RULES:
-1. In ADD MODE: Return existing HTML/CSS + new content
+1. In ADD MODE: Return ONLY new content - system will append it automatically
 2. In EDIT MODE: Return complete HTML/CSS with targeted edits
 3. ALWAYS include both [HTML] and [CSS] sections
 4. ALWAYS use triple backticks with language identifier
@@ -2298,13 +2300,13 @@ CRITICAL RULES:
 
 Example ADD MODE:
 User: [ADD MODE] Add a footer
-Response: Include existing HTML + new footer HTML, existing CSS + new footer CSS
+Response: ONLY the new footer HTML and ONLY the new footer CSS
 
 Example EDIT MODE:
 User: [EDIT MODE - Selected: h1] Make the heading larger
 Response: Include all HTML with h1 modified, all CSS with h1 styles updated
 
-Remember: ALWAYS return COMPLETE code, not just fragments!`
+Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code!`
                             },
                             ...conversationHistory
                         ],
@@ -2863,13 +2865,8 @@ Remember: ALWAYS return COMPLETE code, not just fragments!`
                 return newHTML;
             }
             
-            // Check if AI returned complete HTML (includes existing content)
-            if (newHTML.includes(existingHTML.trim())) {
-                console.log('AI included existing content, using complete version');
-                return newHTML;
-            }
-            
-            // AI provided just new content, append it intelligently
+            // In ADD mode, AI should now return ONLY new content, so always append
+            // No need to check if existing content is included
             // Try to insert before closing body tag if present
             if (existingHTML.includes('</body>')) {
                 console.log('Inserting before </body>');
@@ -2903,35 +2900,10 @@ Remember: ALWAYS return COMPLETE code, not just fragments!`
                 return newCSS;
             }
             
-            // Check if AI returned complete CSS (includes most of existing)
-            // Use a more lenient check - if new CSS contains 70% of existing, it's likely complete
-            const existingTrimmed = existingCSS.trim();
-            const significantExistingCSS = existingTrimmed.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ');
-            const significantNewCSS = newCSS.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ');
-            
-            if (significantExistingCSS.length > 100) { // Only check if existing CSS is substantial
-                const overlap = calculateOverlap(significantExistingCSS, significantNewCSS);
-                if (overlap > 0.7) {
-                    console.log('AI likely included existing CSS (overlap: ' + (overlap * 100).toFixed(1) + '%), using complete version');
-                    return newCSS;
-                }
-            }
-            
-            // Check for duplicate selectors to avoid redundancy
-            const existingSelectors = extractSelectors(existingCSS);
-            const newSelectors = extractSelectors(newCSS);
-            
-            const duplicates = newSelectors.filter(sel => existingSelectors.includes(sel));
-            if (duplicates.length > 0) {
-                console.log('Found duplicate selectors:', duplicates.join(', '));
-                // If there are duplicates, we might want to merge more carefully
-                // For now, we'll still append but with a warning comment
-                return existingCSS + '\n\n/* Added/Updated styles (may contain overrides) */\n' + newCSS;
-            }
-            
-            // Append new CSS with comment separator
-            console.log('Appending new CSS to existing (no duplicates detected)');
-            return existingCSS + '\n\n/* Added styles */\n' + newCSS;
+            // In ADD mode, AI should now return ONLY new styles, so always append
+            // Simple append without complex checks
+            console.log('Appending new CSS to existing');
+            return existingCSS + '\n\n/* New styles */\n' + newCSS;
         }
         
         // Helper function to calculate string overlap
