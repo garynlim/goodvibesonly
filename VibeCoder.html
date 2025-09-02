@@ -663,6 +663,42 @@
             transform: translateY(-1px);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        
+        .suggestion-chip.custom {
+            position: relative;
+            padding-right: 12px;
+        }
+        
+        .suggestion-chip .delete-btn {
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ef4444;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s ease;
+            pointer-events: none;
+            font-size: 14px;
+        }
+        
+        .suggestion-chip.custom:hover .delete-btn {
+            opacity: 1;
+            right: 4px;
+            pointer-events: auto;
+        }
+        
+        .suggestion-chip .delete-btn:hover {
+            background: #dc2626;
+            transform: translateY(-50%) scale(1.1);
+        }
 
         .loading-indicator {
             display: none;
@@ -3991,6 +4027,11 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 chip.className = 'suggestion-chip';
                 chip.title = suggestion.tooltip || suggestion.text;
                 
+                // Add custom class for custom suggestions
+                if (index < customSuggestions.length) {
+                    chip.className += ' custom';
+                }
+                
                 // Create text span for the suggestion content
                 const textSpan = document.createElement('span');
                 textSpan.textContent = `${suggestion.emoji} ${suggestion.text}`;
@@ -4003,21 +4044,10 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 
                 // Add delete button for custom suggestions
                 if (index < customSuggestions.length) {
-                    chip.style.position = 'relative';
-                    chip.style.paddingRight = '20px';
                     const deleteBtn = document.createElement('span');
-                    deleteBtn.innerHTML = '×';
-                    deleteBtn.style.cssText = `
-                        position: absolute;
-                        right: 4px;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        cursor: pointer;
-                        color: #a1a1aa;
-                        font-size: 16px;
-                        line-height: 1;
-                        padding: 2px;
-                    `;
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.innerHTML = '🗑';  // Trash icon
+                    deleteBtn.title = 'Delete this quick start';
                     deleteBtn.onclick = function(e) {
                         e.stopPropagation();
                         deleteSuggestion(index);
