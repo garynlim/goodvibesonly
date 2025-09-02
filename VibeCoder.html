@@ -877,23 +877,17 @@ IMPORTANT IMAGE HANDLING:
 
             <div class="chat-messages" id="chatMessages">
                 <div class="prompt-suggestions" id="promptSuggestions">
-                    <div class="suggestions-header">
+                    <div class="suggestions-header" onclick="toggleSuggestions()" style="cursor: pointer;">
                         <span class="suggestions-label">💡 Quick starts</span>
-                        <button class="suggestions-toggle" onclick="toggleSuggestions()" title="Toggle suggestions">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button class="add-suggestion-btn" onclick="event.stopPropagation(); showAddSuggestionDialog()" title="Add custom quick start" style="background: none; border: none; color: #71717a; cursor: pointer; padding: 4px; display: flex; align-items: center; font-size: 16px;">+</button>
+                            <svg class="suggestions-toggle" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
-                        </button>
+                        </div>
                     </div>
                     <div class="suggestions-grid" id="suggestionsGrid">
-                        <span class="suggestion-chip" onclick="useSuggestion(this)" title="Start with a complete page structure">🏗️ Build landing page with sections</span>
-                        <span class="suggestion-chip" onclick="useSuggestion(this)" title="Upload a screenshot to recreate">📸 Recreate from my screenshot</span>
-                        <span class="suggestion-chip" onclick="useSuggestion(this)" title="Fix issues in existing code">🔧 Debug and improve my code</span>
-                        <span class="suggestion-chip" onclick="useSuggestion(this)" title="Add new functionality">✨ Add dark mode to my site</span>
-                        <span class="suggestion-chip" onclick="useSuggestion(this)" title="Make responsive for all devices">📱 Make my design mobile-friendly</span>
-                        <span class="suggestion-chip" onclick="useSuggestion(this)" title="Add smooth animations">🎨 Add animations and effects</span>
-                        <span class="suggestion-chip" onclick="useSuggestion(this)" title="Convert to Oxygen format">🔄 Convert HTML to Oxygen</span>
-                        <span class="suggestion-chip" onclick="useSuggestion(this)" title="Improve performance">⚡ Optimize for speed and SEO</span>
+                        <!-- Default suggestions will be loaded here -->
                     </div>
                 </div>
             </div>
@@ -1405,6 +1399,9 @@ IMPORTANT IMAGE HANDLING:
             
             // Load last conversation if exists
             loadLastConversation();
+            
+            // Load suggestions
+            loadSuggestions();
             
             // Apply collapsed state for suggestions
             const isCollapsed = localStorage.getItem('vibe_suggestions_collapsed') === 'true';
@@ -3883,26 +3880,30 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 const isCollapsed = localStorage.getItem('vibe_suggestions_collapsed') === 'true';
                 document.getElementById('chatMessages').innerHTML = `
                     <div class="prompt-suggestions ${isCollapsed ? 'collapsed' : ''}" id="promptSuggestions">
-                        <div class="suggestions-header">
+                        <div class="suggestions-header" onclick="toggleSuggestions()" style="cursor: pointer;">
                             <span class="suggestions-label">💡 Quick starts</span>
-                            <button class="suggestions-toggle" onclick="toggleSuggestions()" title="Toggle suggestions">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <button class="add-suggestion-btn" onclick="event.stopPropagation(); showAddSuggestionDialog()" title="Add custom quick start" style="background: none; border: none; color: #71717a; cursor: pointer; padding: 4px; display: flex; align-items: center; font-size: 16px;">+</button>
+                                <svg class="suggestions-toggle" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
-                            </button>
+                            </div>
                         </div>
                         <div class="suggestions-grid" id="suggestionsGrid">
-                            <span class="suggestion-chip" onclick="useSuggestion(this)" title="Start with a complete page structure">🏗️ Build landing page with sections</span>
-                            <span class="suggestion-chip" onclick="useSuggestion(this)" title="Upload a screenshot to recreate">📸 Recreate from my screenshot</span>
-                            <span class="suggestion-chip" onclick="useSuggestion(this)" title="Fix issues in existing code">🔧 Debug and improve my code</span>
-                            <span class="suggestion-chip" onclick="useSuggestion(this)" title="Add new functionality">✨ Add dark mode to my site</span>
-                            <span class="suggestion-chip" onclick="useSuggestion(this)" title="Make responsive for all devices">📱 Make my design mobile-friendly</span>
-                            <span class="suggestion-chip" onclick="useSuggestion(this)" title="Add smooth animations">🎨 Add animations and effects</span>
-                            <span class="suggestion-chip" onclick="useSuggestion(this)" title="Convert to Oxygen format">🔄 Convert HTML to Oxygen</span>
-                            <span class="suggestion-chip" onclick="useSuggestion(this)" title="Improve performance">⚡ Optimize for speed and SEO</span>
                         </div>
                     </div>
                 `;
+                
+                // Load suggestions
+                loadSuggestions();
+                
+                // Apply collapsed state icon if needed
+                if (isCollapsed) {
+                    const toggleIcon = document.querySelector('.suggestions-toggle');
+                    if (toggleIcon) {
+                        toggleIcon.style.transform = 'rotate(-90deg)';
+                    }
+                }
                 
                 // Show success message
                 showMessage('assistant', '✅ Chat history cleared. Your code has been preserved.');
@@ -3930,16 +3931,15 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
 
         function toggleSuggestions() {
             const container = document.getElementById('promptSuggestions');
-            const grid = document.getElementById('suggestionsGrid');
-            const toggleBtn = container.querySelector('.suggestions-toggle svg');
+            const toggleIcon = container.querySelector('.suggestions-toggle');
             
             if (container) {
                 container.classList.toggle('collapsed');
                 const isCollapsed = container.classList.contains('collapsed');
                 
                 // Update icon rotation
-                if (toggleBtn) {
-                    toggleBtn.style.transform = isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)';
+                if (toggleIcon) {
+                    toggleIcon.style.transform = isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)';
                 }
                 
                 // Save state to localStorage
@@ -3948,8 +3948,164 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
         }
 
         function useSuggestion(chip) {
-            document.getElementById('userInput').value = chip.textContent;
+            // Remove emoji if present (first 2-3 characters might be emoji)
+            let text = chip.textContent.trim();
+            // Remove emoji by finding first letter/number
+            const firstLetterIndex = text.search(/[a-zA-Z0-9]/);
+            if (firstLetterIndex > 0) {
+                text = text.substring(firstLetterIndex).trim();
+            }
+            document.getElementById('userInput').value = text;
             document.getElementById('userInput').focus();
+        }
+        
+        // Default suggestions
+        const defaultSuggestions = [
+            { emoji: '🏗️', text: 'Build landing page with sections', tooltip: 'Start with a complete page structure' },
+            { emoji: '📸', text: 'Recreate from my screenshot', tooltip: 'Upload a screenshot to recreate' },
+            { emoji: '🔧', text: 'Debug and improve my code', tooltip: 'Fix issues in existing code' },
+            { emoji: '✨', text: 'Add dark mode to my site', tooltip: 'Add new functionality' },
+            { emoji: '📱', text: 'Make my design mobile-friendly', tooltip: 'Make responsive for all devices' },
+            { emoji: '🎨', text: 'Add animations and effects', tooltip: 'Add smooth animations' },
+            { emoji: '🔄', text: 'Convert HTML to Oxygen', tooltip: 'Convert to Oxygen format' },
+            { emoji: '⚡', text: 'Optimize for speed and SEO', tooltip: 'Improve performance' }
+        ];
+        
+        function loadSuggestions() {
+            const grid = document.getElementById('suggestionsGrid');
+            if (!grid) return;
+            
+            // Load custom suggestions from localStorage
+            const customSuggestions = JSON.parse(localStorage.getItem('vibe_custom_suggestions') || '[]');
+            
+            // Clear grid
+            grid.innerHTML = '';
+            
+            // Add all suggestions (custom first, then defaults)
+            const allSuggestions = [...customSuggestions, ...defaultSuggestions];
+            
+            allSuggestions.forEach((suggestion, index) => {
+                const chip = document.createElement('span');
+                chip.className = 'suggestion-chip';
+                chip.onclick = function() { useSuggestion(this); };
+                chip.title = suggestion.tooltip || suggestion.text;
+                chip.innerHTML = `${suggestion.emoji} ${suggestion.text}`;
+                
+                // Add delete button for custom suggestions
+                if (index < customSuggestions.length) {
+                    chip.style.position = 'relative';
+                    chip.style.paddingRight = '20px';
+                    const deleteBtn = document.createElement('span');
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.style.cssText = `
+                        position: absolute;
+                        right: 4px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        cursor: pointer;
+                        color: #a1a1aa;
+                        font-size: 16px;
+                        line-height: 1;
+                        padding: 2px;
+                    `;
+                    deleteBtn.onclick = function(e) {
+                        e.stopPropagation();
+                        deleteSuggestion(index);
+                    };
+                    chip.appendChild(deleteBtn);
+                }
+                
+                grid.appendChild(chip);
+            });
+        }
+        
+        function deleteSuggestion(index) {
+            const customSuggestions = JSON.parse(localStorage.getItem('vibe_custom_suggestions') || '[]');
+            customSuggestions.splice(index, 1);
+            localStorage.setItem('vibe_custom_suggestions', JSON.stringify(customSuggestions));
+            loadSuggestions();
+        }
+        
+        function showAddSuggestionDialog() {
+            // Create dialog overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            // Create dialog
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                background: white;
+                border-radius: 8px;
+                padding: 24px;
+                max-width: 400px;
+                width: 90%;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            `;
+            
+            dialog.innerHTML = `
+                <h3 style="margin: 0 0 16px 0; color: #09090b;">Add Custom Quick Start</h3>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 13px; color: #71717a; margin-bottom: 4px;">Emoji (optional)</label>
+                    <input type="text" id="suggestionEmoji" placeholder="🚀" maxlength="2" style="width: 60px; padding: 8px; border: 1px solid #e4e4e7; border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 13px; color: #71717a; margin-bottom: 4px;">Text *</label>
+                    <input type="text" id="suggestionText" placeholder="Create a pricing table" style="width: 100%; padding: 8px; border: 1px solid #e4e4e7; border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; color: #71717a; margin-bottom: 4px;">Tooltip (optional)</label>
+                    <input type="text" id="suggestionTooltip" placeholder="Build a responsive pricing section" style="width: 100%; padding: 8px; border: 1px solid #e4e4e7; border-radius: 6px;">
+                </div>
+                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                    <button onclick="this.closest('div[style*=\"position: fixed\"]').remove()" style="padding: 8px 16px; background: white; border: 1px solid #e4e4e7; border-radius: 6px; cursor: pointer;">Cancel</button>
+                    <button onclick="addCustomSuggestion()" style="padding: 8px 16px; background: #09090b; color: white; border: none; border-radius: 6px; cursor: pointer;">Add</button>
+                </div>
+            `;
+            
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+            
+            // Focus on text input
+            setTimeout(() => {
+                document.getElementById('suggestionText').focus();
+            }, 100);
+        }
+        
+        function addCustomSuggestion() {
+            const emoji = document.getElementById('suggestionEmoji').value || '💡';
+            const text = document.getElementById('suggestionText').value.trim();
+            const tooltip = document.getElementById('suggestionTooltip').value.trim();
+            
+            if (!text) {
+                alert('Please enter the quick start text');
+                return;
+            }
+            
+            // Get existing custom suggestions
+            const customSuggestions = JSON.parse(localStorage.getItem('vibe_custom_suggestions') || '[]');
+            
+            // Add new suggestion
+            customSuggestions.push({ emoji, text, tooltip: tooltip || text });
+            
+            // Save to localStorage
+            localStorage.setItem('vibe_custom_suggestions', JSON.stringify(customSuggestions));
+            
+            // Reload suggestions
+            loadSuggestions();
+            
+            // Close dialog
+            document.querySelector('div[style*="position: fixed"]').remove();
         }
         
         function setMode(mode) {
