@@ -4068,13 +4068,25 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                     <input type="text" id="suggestionTooltip" placeholder="Build a responsive pricing section" style="width: 100%; padding: 8px; border: 1px solid #e4e4e7; border-radius: 6px;">
                 </div>
                 <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                    <button onclick="this.closest('div[style*=\"position: fixed\"]').remove()" style="padding: 8px 16px; background: white; border: 1px solid #e4e4e7; border-radius: 6px; cursor: pointer;">Cancel</button>
-                    <button onclick="addCustomSuggestion()" style="padding: 8px 16px; background: #09090b; color: white; border: none; border-radius: 6px; cursor: pointer;">Add</button>
+                    <button id="cancelSuggestionBtn" style="padding: 8px 16px; background: white; border: 1px solid #e4e4e7; border-radius: 6px; cursor: pointer;">Cancel</button>
+                    <button id="addSuggestionBtn" style="padding: 8px 16px; background: #09090b; color: white; border: none; border-radius: 6px; cursor: pointer;">Add</button>
                 </div>
             `;
             
             overlay.appendChild(dialog);
             document.body.appendChild(overlay);
+            
+            // Add overlay ID for easy removal
+            overlay.id = 'suggestionDialogOverlay';
+            
+            // Add event listeners to buttons
+            document.getElementById('cancelSuggestionBtn').onclick = function() {
+                document.getElementById('suggestionDialogOverlay').remove();
+            };
+            
+            document.getElementById('addSuggestionBtn').onclick = function() {
+                addCustomSuggestion();
+            };
             
             // Focus on text input
             setTimeout(() => {
@@ -4105,7 +4117,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             loadSuggestions();
             
             // Close dialog
-            document.querySelector('div[style*="position: fixed"]').remove();
+            document.getElementById('suggestionDialogOverlay').remove();
         }
         
         function setMode(mode) {
