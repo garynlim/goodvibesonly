@@ -3068,16 +3068,24 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
         function setupContextMenu(doc) {
             // Remove any existing listeners
             doc.removeEventListener('contextmenu', handleContextMenu);
-            doc.removeEventListener('click', hideContextMenu);
+            doc.removeEventListener('click', hideContextMenuOnly);
             doc.removeEventListener('mouseover', handleElementHoverEdit);
             doc.removeEventListener('mouseout', handleElementHoverOutEdit);
             
             // Only add listeners if edit mode is active
             if (isEditMode) {
                 doc.addEventListener('contextmenu', handleContextMenu);
-                doc.addEventListener('click', hideContextMenu);
+                doc.addEventListener('click', hideContextMenuOnly);
                 doc.addEventListener('mouseover', handleElementHoverEdit);
                 doc.addEventListener('mouseout', handleElementHoverOutEdit);
+            }
+        }
+        
+        function hideContextMenuOnly(e) {
+            // Only hide context menu, don't select elements
+            const contextMenu = document.getElementById('contextMenu');
+            if (contextMenu && contextMenu.style.display === 'block') {
+                hideContextMenu();
             }
         }
         
@@ -3318,22 +3326,8 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             
             contextMenuTarget = target;
             
-            // Set selectedElement for context menu selection
-            const tagName = target.tagName.toLowerCase();
-            const classes = target.className ? `.${target.className.split(' ').filter(c => c !== 'element-selected' && c !== 'element-highlight').join('.')}` : '';
-            const id = target.id ? `#${target.id}` : '';
-            
-            selectedElement = {
-                element: target,
-                tag: tagName,
-                selector: tagName + id + classes,
-                html: target.outerHTML,
-                text: target.textContent.substring(0, 50)
-            };
-            
-            // Update the element display
-            setMode('edit'); // Switch to edit mode
-            updateSelectedElementDisplay();
+            // Don't set selectedElement or switch modes in manual edit mode
+            // Manual edit mode is separate from chat's edit mode
             
             // Highlight the element
             const iframeDoc = document.getElementById('previewFrame').contentDocument;
