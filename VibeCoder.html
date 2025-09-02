@@ -3947,14 +3947,16 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             }
         }
 
-        function useSuggestion(chip) {
-            // Remove emoji if present (first 2-3 characters might be emoji)
-            let text = chip.textContent.trim();
+        function useSuggestion(textElement) {
+            // Get the text content from the text span
+            let text = textElement.textContent.trim();
+            
             // Remove emoji by finding first letter/number
             const firstLetterIndex = text.search(/[a-zA-Z0-9]/);
             if (firstLetterIndex > 0) {
                 text = text.substring(firstLetterIndex).trim();
             }
+            
             document.getElementById('userInput').value = text;
             document.getElementById('userInput').focus();
         }
@@ -3987,9 +3989,17 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             allSuggestions.forEach((suggestion, index) => {
                 const chip = document.createElement('span');
                 chip.className = 'suggestion-chip';
-                chip.onclick = function() { useSuggestion(this); };
                 chip.title = suggestion.tooltip || suggestion.text;
-                chip.innerHTML = `${suggestion.emoji} ${suggestion.text}`;
+                
+                // Create text span for the suggestion content
+                const textSpan = document.createElement('span');
+                textSpan.textContent = `${suggestion.emoji} ${suggestion.text}`;
+                chip.appendChild(textSpan);
+                
+                // Set onclick on the chip but only use the text span content
+                chip.onclick = function() { 
+                    useSuggestion(textSpan); 
+                };
                 
                 // Add delete button for custom suggestions
                 if (index < customSuggestions.length) {
