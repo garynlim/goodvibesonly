@@ -63,6 +63,7 @@
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             border: 1px solid #e4e4e7;
             overflow: hidden;
+            position: relative;
         }
 
         .chat-header {
@@ -95,22 +96,14 @@
         }
 
         .api-config {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: #fafafa;
-            border-bottom: 1px solid #e4e4e7;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                max-height: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                max-height: 300px;
-                transform: translateY(0);
-            }
+            z-index: 100;
+            overflow-y: auto;
         }
 
         .api-config input {
@@ -414,6 +407,8 @@
 
         .preview-tabs {
             display: flex;
+            padding-top:7px;
+            padding-bottom:7px;
             background: #fafafa;
             border-bottom: 1px solid #e4e4e7;
         }
@@ -433,7 +428,6 @@
         .preview-tab.active {
             color: #09090b;
             border-bottom-color: #09090b;
-            background: white;
         }
         
         .device-toggles {
@@ -829,7 +823,12 @@
 </head>
 <body>
     <div class="header">
-        <h1>✨ Good Vibes Only<span style="font-size: 14px; opacity: 0.8;">for Oxygen Builder</span></h1>
+        <h1 style="display: flex; align-items: center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#09090b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            Good Vibes Only<span style="font-size: 14px; opacity: 0.8;">for Oxygen Builder</span>
+        </h1>
         <p>Chat with AI to create beautiful websites - Export directly to Oxygen Builder</p>
     </div>
 
@@ -837,6 +836,13 @@
         <div class="chat-panel">
             <div class="chat-header">
                 <h3 style="margin: 0; flex: 1;">Vibe here</h3>
+                <button class="media-toggle" onclick="toggleMedia()" title="Generated Images" style="background: none; border: none; color: #71717a; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.background='#f4f4f5'" onmouseout="this.style.background='none'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </button>
                 <button class="settings-toggle" onclick="toggleSettings()" title="Settings">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -846,9 +852,62 @@
                 </button>
             </div>
 
+            <div class="api-config" id="mediaPanel" style="display: none;">
+                <div style="padding: 20px; background: #ffffff; height: 100%; display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e4e4e7;">
+                        <h4 style="margin: 0; color: #09090b; font-weight: 600; display: flex; align-items: center;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#09090b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            Generated Images
+                        </h4>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button onclick="showImageGenerationDialog()" style="padding: 6px 12px; background: #09090b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#27272a'" onmouseout="this.style.background='#09090b'">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Generate New
+                            </button>
+                            <button onclick="toggleMedia()" style="background: none; border: none; cursor: pointer; padding: 5px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#f4f4f5'" onmouseout="this.style.background='none'">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="flex: 1; overflow-y: auto; padding: 10px;">
+                        <div id="mediaGallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                            <!-- Generated images will appear here -->
+                        </div>
+                        <div id="noMediaMessage" style="text-align: center; color: #71717a; padding: 40px 20px; font-size: 14px;">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 10px; opacity: 0.3;">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            <p style="margin: 0;">No images generated yet</p>
+                            <p style="margin: 5px 0 0 0; font-size: 12px; color: #a1a1aa;">Generated images will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="api-config" id="settingsPanel" style="display: none;">
-                <div style="padding: 15px; background: #ffffff; border-radius: 6px; margin: 10px; max-height: 500px; overflow-y: auto; border: 1px solid #e4e4e7;">
-                    <h4 style="margin: 0 0 15px 0; color: #09090b; font-weight: 600;">⚙️ Settings</h4>
+                <div style="padding: 20px; background: #ffffff; height: 100%; display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e4e4e7;">
+                        <h4 style="margin: 0; color: #09090b; font-weight: 600;">⚙️ Settings</h4>
+                        <button onclick="toggleSettings()" style="background: none; border: none; cursor: pointer; padding: 5px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#f4f4f5'" onmouseout="this.style.background='none'">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div style="flex: 1; overflow-y: auto; padding-right: 10px;">
                     
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; font-size: 12px; color: #71717a; margin-bottom: 5px;">OpenRouter API Key:</label>
@@ -908,6 +967,7 @@ IMPORTANT IMAGE HANDLING:
                     </div>
                     
                     <button class="control-button" onclick="saveConfig()" style="width: 100%;">💾 Save Settings</button>
+                    </div>
                 </div>
             </div>
 
@@ -937,11 +997,30 @@ IMPORTANT IMAGE HANDLING:
                     <div class="mode-toggle">
                         <button id="addModeBtn" class="active" onclick="setMode('add')">➕ Add</button>
                         <button id="editModeBtn" onclick="setMode('edit')">✏️ Edit</button>
-                        <button id="referenceModeBtn" onclick="setMode('reference')">🔗 Reference</button>
-                        <button id="planModeBtn" onclick="setMode('plan')">📋 Plan</button>
+                        <button id="referenceModeBtn" onclick="setMode('reference')" style="display: flex; align-items: center; justify-content: center;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                            Reference
+                        </button>
+                        <button id="planModeBtn" onclick="setMode('plan')" style="display: flex; align-items: center; justify-content: center;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            Plan
+                        </button>
                     </div>
                     <button class="element-picker-btn" id="elementPickerBtn" onclick="toggleElementPicker()" style="display: none;">
-                        🎯 Select Element
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m11-11h-6m-6 0H1"></path>
+                        </svg>
+                        Select Element
                     </button>
                 </div>
                 <div class="reference-input" id="referenceInput" style="display: none;">
@@ -952,9 +1031,21 @@ IMPORTANT IMAGE HANDLING:
                     <textarea id="userInput" placeholder="Describe what you want to build... (e.g., 'Create a modern hero section with a gradient background and call-to-action button')" 
                         onkeydown="handleKeyPress(event)"></textarea>
                     <div class="button-row">
-                        <button class="send-button" onclick="sendMessage()" id="sendButton">✨ Send Message</button>
+                        <button class="send-button" onclick="sendMessage()" id="sendButton" style="display: flex; align-items: center; justify-content: center;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                            Send Message
+                        </button>
                         <button class="attach-image-button" onclick="attachImage()" title="Attach an image">
                             📎
+                        </button>
+                        <button class="screenshot-button" onclick="screenshotWithPrompt()" title="Take a screenshot" style="background: white; color: #71717a; border: 1px solid #e4e4e7; padding: 10px; border-radius: 8px; cursor: pointer; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
                         </button>
                     </div>
                     <button class="clear-chat-button" onclick="clearAll()" title="Clear conversation history">Clear chat</button>
@@ -1014,8 +1105,6 @@ IMPORTANT IMAGE HANDLING:
             </div>
 
             <div class="controls">
-                <button class="control-button" onclick="screenshotWithPrompt()" id="screenshotBtn" style="display: none;">📸 Screenshot</button>
-                <button class="control-button" onclick="showImageGenerationDialog()" id="generateImageBtn" style="display: none;">Generate Image</button>
                 <button class="control-button" onclick="showMemoryDialog()">📜 History</button>
                 <button class="control-button" onclick="toggleEditMode()" id="manualEditModeBtn">✏️ Manual Edit Mode</button>
                 <button class="control-button primary" onclick="exportToOxygen()">📤 Export to Oxygen</button>
@@ -1024,12 +1113,32 @@ IMPORTANT IMAGE HANDLING:
     </div>
     
     <!-- Image Generation Dialog -->
-    <div id="imageGenDialog" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
-        <div style="background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
-            <h2 style="margin: 0 0 20px 0; color: #333;">🎨 Generate Image with AI</h2>
+    <div id="imageGenDialog" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;" onclick="if(event.target === this) closeImageGenDialog()">
+        <div style="background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;" onclick="event.stopPropagation()">
+            <h2 style="margin: 0 0 20px 0; color: #333; display: flex; align-items: center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 2v20"></path>
+                    <path d="M12 2a10 10 0 0 1 0 20"></path>
+                </svg>
+                Generate Image with AI
+            </h2>
+            
+            <!-- Gallery Section for Previously Generated Images -->
+            <div style="margin-bottom: 20px; border: 1px solid #e4e4e7; border-radius: 8px; padding: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">Choose from Gallery:</label>
+                <div id="dialogMediaGallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; max-height: 150px; overflow-y: auto; padding: 10px 0;">
+                    <!-- Gallery images will be loaded here -->
+                </div>
+                <p id="noGalleryImages" style="text-align: center; color: #999; font-size: 13px; margin: 10px 0; display: none;">No images in gallery yet</p>
+            </div>
+            
+            <div style="text-align: center; margin: 15px 0;">
+                <span style="color: #999; font-size: 13px;">— OR —</span>
+            </div>
             
             <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">Upload reference images (optional):</label>
+                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">Upload from computer:</label>
                 <input type="file" id="imageInputFiles" multiple accept="image/*" onchange="handleImageSelection(this)" 
                     style="display: none;">
                 <button onclick="document.getElementById('imageInputFiles').click()" 
@@ -1037,6 +1146,10 @@ IMPORTANT IMAGE HANDLING:
                     📁 Choose Images
                 </button>
                 <div id="selectedImagesPreview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;"></div>
+            </div>
+            
+            <div style="text-align: center; margin: 15px 0;">
+                <span style="color: #999; font-size: 13px;">— OR —</span>
             </div>
             
             <div style="margin-bottom: 20px;">
@@ -1064,8 +1177,8 @@ IMPORTANT IMAGE HANDLING:
             </div>
             
             <div id="imageGenLoading" style="display: none; text-align: center; padding: 20px;">
-                <div style="font-size: 40px; animation: spin 1s linear infinite;">🎨</div>
-                <p style="margin-top: 10px; color: #71717a;">Generating your image...</p>
+                <div style="display: inline-block; width: 40px; height: 40px; border: 3px solid #e4e4e7; border-top-color: #09090b; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="margin-top: 16px; color: #71717a; font-size: 14px;">Generating your image...</p>
             </div>
             
             <div id="imageGenResult" style="display: none; margin: 20px 0;">
@@ -1081,31 +1194,169 @@ IMPORTANT IMAGE HANDLING:
     </div>
     
     <!-- Context Menu for Preview Elements -->
-    <div id="contextMenu" style="display: none; position: absolute; background: white; border: 1px solid #e4e4e7; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; min-width: 200px;">
-        <div style="padding: 8px 0;">
-            <div class="context-menu-item" onclick="editElementText()" style="padding: 10px 20px; cursor: pointer; font-size: 14px;">
-                ✏️ Edit Text
+    <div id="contextMenu" style="display: none; position: absolute; background: white; border: 1px solid #e4e4e7; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; min-width: 220px;">
+        <div style="padding: 6px 0;">
+            <!-- Quick Actions -->
+            <div class="context-menu-item" id="editTextBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Edit Text
             </div>
-            <div class="context-menu-item" onclick="editElementStyles()" style="padding: 10px 20px; cursor: pointer; font-size: 14px;">
-                🎨 Edit Styles
+            <div class="context-menu-item" id="editStylesBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+                Quick Styles
             </div>
-            <div class="context-menu-item" onclick="editElementPadding()" style="padding: 10px 20px; cursor: pointer; font-size: 14px;">
-                📐 Edit Padding/Margin
+            <div class="context-menu-item" id="editPaddingBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                    <line x1="15" y1="3" x2="15" y2="21"></line>
+                </svg>
+                Adjust Spacing
             </div>
-            <div class="context-menu-item" onclick="editElementLink()" id="editLinkOption" style="padding: 10px 20px; cursor: pointer; font-size: 14px;">
-                🔗 Edit Link
+            <div class="context-menu-item" id="editSizeBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                    <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                    <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                Edit Size
             </div>
-            <div class="context-menu-item" onclick="editElementBackground()" style="padding: 10px 20px; cursor: pointer; font-size: 14px;">
-                🖼️ Edit Background
+            
+            <!-- Divider -->
+            <div style="border-top: 1px solid #e4e4e7; margin: 4px 0;"></div>
+            
+            <!-- Layout Adjustments -->
+            <div class="context-menu-item" id="alignLeftBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <line x1="17" y1="10" x2="3" y2="10"></line>
+                    <line x1="21" y1="6" x2="3" y2="6"></line>
+                    <line x1="21" y1="14" x2="3" y2="14"></line>
+                    <line x1="17" y1="18" x2="3" y2="18"></line>
+                </svg>
+                Align Left
             </div>
-            <div class="context-menu-item" onclick="addImageToElement()" style="padding: 10px 20px; cursor: pointer; font-size: 14px; border-top: 1px solid #eee;">
-                ➕ Add Image Here
+            <div class="context-menu-item" id="alignCenterBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <line x1="18" y1="10" x2="6" y2="10"></line>
+                    <line x1="21" y1="6" x2="3" y2="6"></line>
+                    <line x1="21" y1="14" x2="3" y2="14"></line>
+                    <line x1="18" y1="18" x2="6" y2="18"></line>
+                </svg>
+                Center
             </div>
-            <div class="context-menu-item" onclick="duplicateElement()" style="padding: 10px 20px; cursor: pointer; font-size: 14px;">
-                📋 Duplicate
+            <div class="context-menu-item" id="alignRightBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <line x1="21" y1="10" x2="7" y2="10"></line>
+                    <line x1="21" y1="6" x2="3" y2="6"></line>
+                    <line x1="21" y1="14" x2="3" y2="14"></line>
+                    <line x1="21" y1="18" x2="7" y2="18"></line>
+                </svg>
+                Align Right
             </div>
-            <div class="context-menu-item" onclick="deleteElement()" style="padding: 10px 20px; cursor: pointer; font-size: 14px; color: #dc3545;">
-                🗑️ Delete
+            
+            <!-- Divider -->
+            <div style="border-top: 1px solid #e4e4e7; margin: 4px 0;"></div>
+            
+            <!-- Reorder -->
+            <div class="context-menu-item" id="moveUpBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+                Move Up
+            </div>
+            <div class="context-menu-item" id="moveDownBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                </svg>
+                Move Down
+            </div>
+            
+            <!-- Divider -->
+            <div style="border-top: 1px solid #e4e4e7; margin: 4px 0;"></div>
+            
+            <!-- Responsive -->
+            <div class="context-menu-item" id="hideMobileBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                </svg>
+                Hide on Mobile
+            </div>
+            <div class="context-menu-item" id="hideDesktopBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                Hide on Desktop
+            </div>
+            
+            <!-- Divider -->
+            <div style="border-top: 1px solid #e4e4e7; margin: 4px 0;"></div>
+            
+            <!-- Content Actions -->
+            <div class="context-menu-item" id="editLinkOption" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                Make Clickable
+            </div>
+            <div class="context-menu-item" id="replaceImageBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                Replace Image
+            </div>
+            <div class="context-menu-item" id="duplicateBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Duplicate
+            </div>
+            
+            <!-- Divider -->
+            <div style="border-top: 1px solid #e4e4e7; margin: 4px 0;"></div>
+            
+            <!-- AI Refinement -->
+            <div class="context-menu-item" id="aiRefineBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; background: linear-gradient(90deg, #f0f0f0, #fafafa); display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                AI Refine This
+            </div>
+            <div class="context-menu-item" id="aiAlternativeBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; background: linear-gradient(90deg, #f0f0f0, #fafafa); display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                Generate Alternative
+            </div>
+            
+            <!-- Divider -->
+            <div style="border-top: 1px solid #e4e4e7; margin: 4px 0;"></div>
+            
+            <!-- Delete -->
+            <div class="context-menu-item" id="deleteBtn" style="padding: 8px 16px; cursor: pointer; font-size: 13px; color: #dc3545; display: flex; align-items: center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                Delete
             </div>
         </div>
     </div>
@@ -1125,11 +1376,11 @@ IMPORTANT IMAGE HANDLING:
     </div>
     
     <!-- Memory Dialog Modal -->
-    <div id="memoryDialog" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000;">
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; padding: 30px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-            <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px;">📜 Conversation History</h2>
+    <div id="memoryDialog" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 10000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 8px; padding: 24px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid #e4e4e7;">
+            <h2 style="margin-top: 0; color: #09090b; border-bottom: 1px solid #e4e4e7; padding-bottom: 12px; font-size: 20px; font-weight: 600;">📜 Conversation History</h2>
             
-            <div id="memoryStats" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+            <div id="memoryStats" style="background: #fafafa; padding: 16px; border-radius: 6px; margin: 16px 0; border: 1px solid #e4e4e7;">
                 <!-- Stats will be populated here -->
             </div>
             
@@ -1138,8 +1389,8 @@ IMPORTANT IMAGE HANDLING:
             </div>
             
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                <button onclick="clearMemory()" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer;">Clear All Memory</button>
-                <button onclick="closeMemoryDialog()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">Close</button>
+                <button onclick="clearMemory()" style="padding: 8px 16px; background: white; color: #ef4444; border: 1px solid #e4e4e7; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s;" onmouseover="this.style.background='#fef2f2'; this.style.borderColor='#ef4444'" onmouseout="this.style.background='white'; this.style.borderColor='#e4e4e7'">Clear All Memory</button>
+                <button onclick="closeMemoryDialog()" style="padding: 8px 16px; background: #09090b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s;" onmouseover="this.style.background='#27272a'" onmouseout="this.style.background='#09090b'">Close</button>
             </div>
         </div>
     </div>
@@ -1379,6 +1630,19 @@ IMPORTANT IMAGE HANDLING:
         
         // Load saved API key and memory on startup
         window.onload = function() {
+            // Clean up any existing edit mode indicators on page load
+            const previewFrame = document.getElementById('previewFrame');
+            if (previewFrame && previewFrame.contentDocument) {
+                const iframeDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+                const existingIndicator = iframeDoc.getElementById('editModeIndicator');
+                if (existingIndicator) {
+                    existingIndicator.remove();
+                    console.log('Removed existing edit mode indicator on page load');
+                }
+            }
+            
+            // Ensure edit mode is off on page load
+            isEditMode = false;
             
             const savedKey = localStorage.getItem('openrouter_api_key');
             const savedModel = localStorage.getItem('openrouter_model');
@@ -1399,11 +1663,9 @@ IMPORTANT IMAGE HANDLING:
             if (savedVisionModel) {
                 document.getElementById('visionModelSelect').value = savedVisionModel;
             }
-            // Always enable screenshot button since we have a vision model by default
-            document.getElementById('screenshotBtn').style.display = 'inline-block';
+            // Screenshot button is always visible in the chat input area
             
-            // Always enable image generation button since we have an image model by default
-            document.getElementById('generateImageBtn').style.display = 'inline-block';
+            // Image generation button is now in the media panel
             if (savedSystemPrompt) {
                 document.getElementById('systemPrompt').value = savedSystemPrompt;
             }
@@ -1438,6 +1700,12 @@ IMPORTANT IMAGE HANDLING:
             
             // Load suggestions
             loadSuggestions();
+            
+            // Load generated images
+            loadGeneratedImages();
+            
+            // Initialize context menu event listeners
+            initializeContextMenuListeners();
             
             // Apply collapsed state for suggestions
             const isCollapsed = localStorage.getItem('vibe_suggestions_collapsed') === 'true';
@@ -1528,7 +1796,7 @@ IMPORTANT IMAGE HANDLING:
                         updatePreview();
                         generateOxygenJSON();
                         
-                        showMessage('assistant', '💾 Restored your last session. Continue where you left off!');
+                        showToast('💾 Restored your last session. Continue where you left off!', 3000);
                     }
                 }
             } catch (e) {
@@ -1616,15 +1884,15 @@ IMPORTANT IMAGE HANDLING:
             statDiv.innerHTML = `
                 <div style="display: flex; justify-content: space-around;">
                     <div style="text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #667eea;">${totalMemory}</div>
+                        <div style="font-size: 24px; font-weight: 600; color: #09090b;">${totalMemory}</div>
                         <div style="font-size: 12px; color: #71717a;">Total Memories</div>
                     </div>
                     <div style="text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #28a745;">${todayMemory}</div>
+                        <div style="font-size: 24px; font-weight: 600; color: #09090b;">${todayMemory}</div>
                         <div style="font-size: 12px; color: #71717a;">Today's Sessions</div>
                     </div>
                     <div style="text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #17a2b8;">${conversationHistory.length}</div>
+                        <div style="font-size: 24px; font-weight: 600; color: #09090b;">${conversationHistory.length}</div>
                         <div style="font-size: 12px; color: #71717a;">Current Chat</div>
                     </div>
                 </div>
@@ -1638,34 +1906,43 @@ IMPORTANT IMAGE HANDLING:
                 listDiv.innerHTML = memories.slice(0, 20).map((mem, index) => {
                     const date = new Date(mem.timestamp);
                     const timeAgo = getTimeAgo(date);
-                    const modeIcon = mem.mode === 'add' ? '➕' : (mem.mode === 'edit' ? '✏️' : '🔗');
+                    const modeIcon = mem.mode === 'add' ? 
+                        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>' : 
+                        (mem.mode === 'edit' ? 
+                        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>' : 
+                        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>');
                     const memIndex = conversationMemory.length - 1 - index; // Get actual index in array
                     
                     // Check if this version has code
                     const hasCode = mem.codeSnapshot && (mem.codeSnapshot.html || mem.codeSnapshot.css || mem.codeSnapshot.js);
                     
                     return `
-                        <div style="background: #f8f9fa; padding: 12px; margin: 8px 0; border-radius: 8px; border-left: 3px solid #667eea;">
+                        <div style="background: #fafafa; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #e4e4e7;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="font-weight: 500; color: #333;">${modeIcon} ${mem.mode.toUpperCase()} Mode</span>
-                                <span style="font-size: 12px; color: #999;">${timeAgo}</span>
+                                <span style="font-weight: 500; color: #09090b;">${modeIcon} ${mem.mode.toUpperCase()} Mode</span>
+                                <span style="font-size: 12px; color: #a1a1aa;">${timeAgo}</span>
                             </div>
                             <div style="font-size: 14px; color: #71717a; margin-bottom: 5px;">
                                 <strong>Q:</strong> ${mem.input.substring(0, 100)}${mem.input.length > 100 ? '...' : ''}
                             </div>
-                            <div style="font-size: 13px; color: #888; margin-bottom: 8px;">
+                            <div style="font-size: 13px; color: #71717a; margin-bottom: 8px;">
                                 <strong>A:</strong> ${mem.response.substring(0, 150)}${mem.response.length > 150 ? '...' : ''}
                             </div>
                             ${hasCode ? `
                                 <div style="display: flex; gap: 8px; margin-top: 8px;">
-                                    <button onclick="restoreCodeVersion(${memIndex})" style="background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 6px; background: white; font-size: 12px; cursor: pointer;">
-                                        🔄 Restore This Version
+                                    <button onclick="restoreCodeVersion(${memIndex})" style="background: #09090b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#27272a'" onmouseout="this.style.background='#09090b'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; display: inline-block; vertical-align: middle;">
+                                            <polyline points="23 4 23 10 17 10"></polyline>
+                                            <polyline points="1 20 1 14 7 14"></polyline>
+                                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                        </svg>
+                                        Restore
                                     </button>
-                                    <button onclick="viewCodeSnapshot(${memIndex})" style="background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 6px; background: white; font-size: 12px; cursor: pointer;">
-                                        👁️ Preview Code
+                                    <button onclick="previewVersion(${memIndex})" style="background: white; color: #09090b; border: 1px solid #e4e4e7; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f4f4f5'" onmouseout="this.style.background='white'">
+                                        👁️ Preview
                                     </button>
                                 </div>
-                            ` : '<div style="font-size: 11px; color: #999; font-style: italic;">No code snapshot available</div>'}
+                            ` : '<div style="font-size: 11px; color: #a1a1aa; font-style: italic;">No code snapshot available</div>'}
                         </div>
                     `;
                 }).join('');
@@ -1702,18 +1979,18 @@ IMPORTANT IMAGE HANDLING:
                 
                 // Close dialog and show success message
                 closeMemoryDialog();
-                showMessage('assistant', `✅ Restored code version from ${getTimeAgo(new Date(memory.timestamp))}`);
+                showToast(`✅ Restored code version from ${getTimeAgo(new Date(memory.timestamp))}`, 3000);
             }
         }
         
-        function viewCodeSnapshot(index) {
+        function previewVersion(index) {
             const memory = conversationMemory[index];
             if (!memory || !memory.codeSnapshot) {
                 alert('No code snapshot available for this version');
                 return;
             }
             
-            // Create a modal to show the code
+            // Create a modal to show the rendered preview
             const modal = document.createElement('div');
             modal.style.cssText = `
                 position: fixed;
@@ -1721,7 +1998,7 @@ IMPORTANT IMAGE HANDLING:
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: rgba(0,0,0,0.8);
+                background: rgba(0,0,0,0.4);
                 z-index: 10002;
                 display: flex;
                 align-items: center;
@@ -1732,42 +2009,77 @@ IMPORTANT IMAGE HANDLING:
             const content = document.createElement('div');
             content.style.cssText = `
                 background: white;
-                border-radius: 12px;
-                max-width: 900px;
-                max-height: 80vh;
-                width: 100%;
+                border-radius: 8px;
+                max-width: 1200px;
+                max-height: 90vh;
+                width: 90%;
                 overflow: hidden;
+                border: 1px solid #e4e4e7;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.15);
                 display: flex;
                 flex-direction: column;
             `;
             
             content.innerHTML = `
-                <div style="padding: 20px; border-bottom: 1px solid #e9ecef;">
-                    <h3 style="margin: 0; color: #333;">Code Snapshot - ${getTimeAgo(new Date(memory.timestamp))}</h3>
-                    <p style="margin: 5px 0 0 0; color: #71717a; font-size: 14px;">${memory.input.substring(0, 100)}...</p>
+                <div style="padding: 16px 20px; border-bottom: 1px solid #e4e4e7; background: #fafafa;">
+                    <h3 style="margin: 0; color: #09090b; font-size: 18px; font-weight: 600;">Preview - ${getTimeAgo(new Date(memory.timestamp))}</h3>
+                    <p style="margin: 4px 0 0 0; color: #71717a; font-size: 14px;">${memory.input.substring(0, 100)}...</p>
                 </div>
-                <div style="flex: 1; overflow-y: auto; padding: 20px;">
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #667eea; margin-bottom: 10px;">HTML</h4>
-                        <pre style="background: #f8f9fa; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 12px; max-height: 200px;">${escapeHtml(memory.codeSnapshot.html || 'No HTML')}</pre>
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #667eea; margin-bottom: 10px;">CSS</h4>
-                        <pre style="background: #f8f9fa; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 12px; max-height: 200px;">${escapeHtml(memory.codeSnapshot.css || 'No CSS')}</pre>
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #667eea; margin-bottom: 10px;">JavaScript</h4>
-                        <pre style="background: #f8f9fa; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 12px; max-height: 200px;">${escapeHtml(memory.codeSnapshot.js || 'No JavaScript')}</pre>
-                    </div>
+                <div style="flex: 1; background: #fafafa; padding: 20px; display: flex; align-items: center; justify-content: center;">
+                    <iframe id="memoryPreviewFrame" style="width: 100%; height: 500px; max-width: 1024px; border: 1px solid #e4e4e7; border-radius: 6px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></iframe>
                 </div>
-                <div style="padding: 20px; border-top: 1px solid #e9ecef; display: flex; gap: 10px; justify-content: flex-end;">
-                    <button onclick="this.closest('div[style*=\\"position: fixed\\"]').remove()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">Close</button>
-                    <button onclick="restoreCodeVersion(${index}); this.closest('div[style*=\\"position: fixed\\"]').remove()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">Restore This Version</button>
+                <div style="padding: 16px 20px; border-top: 1px solid #e4e4e7; display: flex; gap: 8px; justify-content: flex-end; background: white;">
+                    <button id="previewCloseBtn" style="padding: 8px 16px; background: white; color: #09090b; border: 1px solid #e4e4e7; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s;">Close</button>
+                    <button id="previewRestoreBtn" style="padding: 8px 16px; background: #09090b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s;">Restore This Version</button>
                 </div>
             `;
             
             modal.appendChild(content);
             document.body.appendChild(modal);
+            
+            // Add event listeners for buttons
+            const closeBtn = document.getElementById('previewCloseBtn');
+            const restoreBtn = document.getElementById('previewRestoreBtn');
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => modal.remove());
+                closeBtn.addEventListener('mouseover', () => closeBtn.style.background = '#fafafa');
+                closeBtn.addEventListener('mouseout', () => closeBtn.style.background = 'white');
+            }
+            
+            if (restoreBtn) {
+                restoreBtn.addEventListener('click', () => {
+                    restoreCodeVersion(index);
+                    modal.remove();
+                });
+                restoreBtn.addEventListener('mouseover', () => restoreBtn.style.background = '#27272a');
+                restoreBtn.addEventListener('mouseout', () => restoreBtn.style.background = '#09090b');
+            }
+            
+            // Load the preview content into the iframe
+            setTimeout(() => {
+                const iframe = document.getElementById('memoryPreviewFrame');
+                if (iframe) {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    const fullHTML = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <style>${memory.codeSnapshot.css || ''}</style>
+                        </head>
+                        <body>
+                            ${memory.codeSnapshot.html || ''}
+                            <script>${memory.codeSnapshot.js || ''}<\/script>
+                        </body>
+                        </html>
+                    `;
+                    iframeDoc.open();
+                    iframeDoc.write(fullHTML);
+                    iframeDoc.close();
+                }
+            }, 100);
             
             // Close on backdrop click
             modal.addEventListener('click', (e) => {
@@ -1785,7 +2097,11 @@ IMPORTANT IMAGE HANDLING:
         
         function toggleSettings() {
             const settingsPanel = document.getElementById('settingsPanel');
+            const mediaPanel = document.getElementById('mediaPanel');
             const isVisible = settingsPanel.style.display !== 'none';
+            
+            // Hide media panel if open
+            mediaPanel.style.display = 'none';
             
             if (isVisible) {
                 settingsPanel.style.display = 'none';
@@ -1796,6 +2112,190 @@ IMPORTANT IMAGE HANDLING:
                 if (!apiKeyInput.value) {
                     apiKeyInput.focus();
                 }
+            }
+        }
+        
+        function toggleMedia() {
+            const mediaPanel = document.getElementById('mediaPanel');
+            const settingsPanel = document.getElementById('settingsPanel');
+            const isVisible = mediaPanel.style.display !== 'none';
+            
+            // Hide settings panel if open
+            settingsPanel.style.display = 'none';
+            
+            if (isVisible) {
+                mediaPanel.style.display = 'none';
+            } else {
+                mediaPanel.style.display = 'block';
+                updateMediaGallery();
+            }
+        }
+        
+        let generatedImages = [];
+        
+        function updateMediaGallery() {
+            const gallery = document.getElementById('mediaGallery');
+            const noMediaMessage = document.getElementById('noMediaMessage');
+            
+            if (generatedImages.length === 0) {
+                gallery.style.display = 'none';
+                noMediaMessage.style.display = 'block';
+            } else {
+                gallery.style.display = 'grid';
+                noMediaMessage.style.display = 'none';
+                
+                gallery.innerHTML = generatedImages.map((img, index) => `
+                    <div style="position: relative; border: 1px solid #e4e4e7; border-radius: 6px; overflow: hidden; background: white;">
+                        <img src="${img.url}" alt="${img.prompt}" style="width: 100%; height: 150px; object-fit: cover; cursor: pointer;" onclick="viewGeneratedImage(${index})" title="Click to view">
+                        <div style="padding: 8px;">
+                            <p style="margin: 0; font-size: 11px; color: #71717a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${img.prompt}">${img.prompt}</p>
+                            <div style="display: flex; gap: 4px; margin-top: 8px;">
+                                <button onclick="insertGeneratedImage(${index})" style="flex: 1; padding: 4px; font-size: 11px; background: #09090b; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Insert into design">Insert</button>
+                                <button onclick="deleteGeneratedImage(${index})" style="padding: 4px 8px; font-size: 11px; background: white; color: #ef4444; border: 1px solid #ef4444; border-radius: 4px; cursor: pointer;" title="Delete">🗑</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        async function saveGeneratedImage(url, prompt) {
+            try {
+                // Compress image before storing if it's base64
+                let compressedUrl = url;
+                if (url.startsWith('data:image')) {
+                    // Compress to smaller size for storage
+                    compressedUrl = await compressAndResizeImage(url, 512, 512, 0.7);
+                }
+                
+                generatedImages.push({
+                    url: compressedUrl,
+                    prompt: prompt,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Limit to last 20 images to prevent quota issues
+                if (generatedImages.length > 20) {
+                    generatedImages = generatedImages.slice(-20);
+                    console.log('Limited gallery to last 20 images to prevent storage quota issues');
+                }
+                
+                try {
+                    localStorage.setItem('vibe_generated_images', JSON.stringify(generatedImages));
+                } catch (e) {
+                    if (e.name === 'QuotaExceededError') {
+                        // If still exceeding quota, keep only last 10 images
+                        console.warn('Storage quota exceeded, reducing to last 10 images');
+                        generatedImages = generatedImages.slice(-10);
+                        
+                        // Try again with fewer images
+                        try {
+                            localStorage.setItem('vibe_generated_images', JSON.stringify(generatedImages));
+                        } catch (e2) {
+                            // If still failing, store only URLs without base64 data
+                            console.error('Storage quota still exceeded, clearing image gallery');
+                            generatedImages = [];
+                            localStorage.removeItem('vibe_generated_images');
+                            showToast('⚠️ Storage full - Image gallery cleared', 3000);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error saving image:', error);
+                // Don't block image generation if storage fails
+            }
+        }
+        
+        function loadGeneratedImages() {
+            try {
+                const saved = localStorage.getItem('vibe_generated_images');
+                if (saved) {
+                    generatedImages = JSON.parse(saved);
+                    
+                    // Clean up any corrupted entries
+                    generatedImages = generatedImages.filter(img => img && img.url);
+                }
+            } catch (e) {
+                console.error('Error loading generated images:', e);
+                generatedImages = [];
+                localStorage.removeItem('vibe_generated_images');
+            }
+        }
+        
+        function deleteGeneratedImage(index) {
+            if (confirm('Delete this image from the gallery?')) {
+                generatedImages.splice(index, 1);
+                try {
+                    localStorage.setItem('vibe_generated_images', JSON.stringify(generatedImages));
+                } catch (e) {
+                    console.error('Error updating storage after delete:', e);
+                }
+                updateMediaGallery();
+            }
+        }
+        
+        function viewGeneratedImage(index) {
+            const img = generatedImages[index];
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                z-index: 10002;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; max-width: 90%; max-height: 90%; overflow: hidden; border: 1px solid #e4e4e7;">
+                    <div style="padding: 16px; border-bottom: 1px solid #e4e4e7;">
+                        <p style="margin: 0; color: #09090b; font-size: 14px;">${img.prompt}</p>
+                    </div>
+                    <img src="${img.url}" style="max-width: 100%; max-height: calc(90vh - 100px); object-fit: contain; display: block;">
+                    <div style="padding: 16px; border-top: 1px solid #e4e4e7; display: flex; gap: 8px; justify-content: flex-end;">
+                        <button onclick="this.closest('div[style*=\\"position: fixed\\"]').remove()" style="padding: 8px 16px; background: white; color: #09090b; border: 1px solid #e4e4e7; border-radius: 6px; cursor: pointer;">Close</button>
+                        <button onclick="insertGeneratedImage(${index}); this.closest('div[style*=\\"position: fixed\\"]').remove()" style="padding: 8px 16px; background: #09090b; color: white; border: none; border-radius: 6px; cursor: pointer;">Insert into Design</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+        
+        function insertGeneratedImage(index) {
+            const img = generatedImages[index];
+            const selectedEl = selectedElement || document.querySelector('#preview-content');
+            
+            if (selectedEl) {
+                const imgElement = document.createElement('img');
+                imgElement.src = img.url;
+                imgElement.alt = img.prompt;
+                imgElement.style.width = '100%';
+                imgElement.style.height = 'auto';
+                imgElement.style.borderRadius = '8px';
+                
+                if (selectedEl.id === 'preview-content') {
+                    selectedEl.appendChild(imgElement);
+                } else {
+                    selectedEl.innerHTML = '';
+                    selectedEl.appendChild(imgElement);
+                }
+                
+                updatePreview();
+                generateOxygenJSON();
+                showToast('✅ Image inserted successfully!', 2000);
+            } else {
+                showToast('⚠️ Please select an element first', 2000);
             }
         }
 
@@ -1823,18 +2323,14 @@ IMPORTANT IMAGE HANDLING:
             
             checkMultimodalSupport(model);
             
-            // Also enable screenshot if vision model is selected
-            if (visionModel) {
-                document.getElementById('screenshotBtn').style.display = 'inline-block';
-            }
+            // Screenshot feature available when vision model is selected
             
-            // Always show image generation button (only one model available)
-            document.getElementById('generateImageBtn').style.display = 'inline-block';
+            // Image generation button is now in the media panel
             
             // Hide settings panel after saving
             document.getElementById('settingsPanel').style.display = 'none';
             
-            showMessage('assistant', '✅ Settings saved! Your system prompt and brand guidelines will be applied to all conversations.');
+            showToast('✅ Settings saved! Your system prompt and brand guidelines will be applied to all conversations.', 3000);
         }
         
         function getSystemPromptWithBrandGuidelines() {
@@ -1852,12 +2348,9 @@ IMPORTANT IMAGE HANDLING:
         }
         
         function checkMultimodalSupport(model) {
-            const screenshotBtn = document.getElementById('screenshotBtn');
             if (multimodalModels.includes(model)) {
-                screenshotBtn.style.display = 'inline-block';
                 console.log('Multimodal model detected - screenshot feature enabled');
             } else {
-                screenshotBtn.style.display = 'none';
                 console.log('Text-only model - screenshot feature disabled');
             }
         }
@@ -2027,7 +2520,13 @@ IMPORTANT IMAGE HANDLING:
             exitPrompt.className = 'plan-exit-prompt';
             exitPrompt.innerHTML = `
                 <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px; border-radius: 8px; margin: 15px 0;">
-                    <h4 style="margin: 0 0 10px 0;">📋 Planning Complete!</h4>
+                    <h4 style="margin: 0 0 10px 0; display: flex; align-items: center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Planning Complete!
+                    </h4>
                     <p style="margin: 10px 0;">I've created a plan with ${plannedTasks.length} tasks. Ready to start building?</p>
                     <div style="display: flex; gap: 10px; margin-top: 15px;">
                         <button onclick="exitPlanMode()" style="background: white; color: #667eea; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
@@ -2078,7 +2577,13 @@ IMPORTANT IMAGE HANDLING:
                     <div id="taskList" style="margin: 10px 0;">
                         ${plannedTasks.map((task, index) => `
                             <div class="task-item" style="padding: 8px; margin: 5px 0; background: white; border-radius: 6px; background: white; display: flex; align-items: center;">
-                                <span style="margin-right: 10px;">${task.completed ? '✅' : index === currentTaskIndex ? '🔄' : '⏳'}</span>
+                                <span style="margin-right: 10px; display: inline-flex; align-items: center;">${
+                        task.completed ? 
+                        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' : 
+                        index === currentTaskIndex ? 
+                        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>' : 
+                        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
+                    }</span>
                                 <span style="flex: 1; ${index === currentTaskIndex ? 'font-weight: bold;' : ''}">${task.description}</span>
                             </div>
                         `).join('')}
@@ -2153,7 +2658,13 @@ IMPORTANT IMAGE HANDLING:
             const taskList = document.getElementById('taskList');
             taskList.innerHTML = plannedTasks.map((task, index) => `
                 <div class="task-item" style="padding: 8px; margin: 5px 0; background: white; border-radius: 6px; background: white; display: flex; align-items: center;">
-                    <span style="margin-right: 10px;">${task.completed ? '✅' : index === currentTaskIndex ? '🔄' : '⏳'}</span>
+                    <span style="margin-right: 10px; display: inline-flex; align-items: center;">${
+                        task.completed ? 
+                        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' : 
+                        index === currentTaskIndex ? 
+                        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>' : 
+                        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
+                    }</span>
                     <span style="flex: 1; ${index === currentTaskIndex ? 'font-weight: bold;' : ''}">${task.description}</span>
                 </div>
             `).join('');
@@ -2412,7 +2923,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                         } else {
                             // If no tasks were extracted, show a hint to the user
                             setTimeout(() => {
-                                showMessage('assistant', '💡 Tip: I\'m ready to help plan your project. Please describe what you want to build, and I\'ll create a detailed task list for implementation.');
+                                showMessage('assistant', 'I\'m ready to help plan your project. Please describe what you want to build, and I\'ll create a detailed task list for implementation.');
                             }, 1000);
                         }
                     }
@@ -3032,6 +3543,13 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             const preview = document.getElementById('previewFrame');
             const doc = preview.contentDocument || preview.contentWindow.document;
             
+            // Clean up any existing edit mode indicator before updating
+            const existingIndicator = doc.getElementById('editModeIndicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+                console.log('Cleaned up existing indicator in updatePreview');
+            }
+            
             const fullHTML = `
                 <!DOCTYPE html>
                 <html>
@@ -3054,6 +3572,15 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             doc.write(fullHTML);
             doc.close();
             
+            // Clean up any indicator that might have been in the HTML content
+            setTimeout(() => {
+                const indicator = doc.getElementById('editModeIndicator');
+                if (indicator && !isEditMode) {
+                    indicator.remove();
+                    console.log('Removed indicator after document write');
+                }
+            }, 0);
+            
             // Add JavaScript after the document is written to avoid escaping issues
             if (currentJS && currentJS.trim()) {
                 const script = doc.createElement('script');
@@ -3071,6 +3598,15 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             doc.removeEventListener('click', hideContextMenuOnly);
             doc.removeEventListener('mouseover', handleElementHoverEdit);
             doc.removeEventListener('mouseout', handleElementHoverOutEdit);
+            
+            // Clean up any stray indicators if edit mode is off
+            if (!isEditMode) {
+                const indicator = doc.getElementById('editModeIndicator');
+                if (indicator) {
+                    indicator.remove();
+                    console.log('Cleaned up indicator in setupContextMenu');
+                }
+            }
             
             // Only add listeners if edit mode is active
             if (isEditMode) {
@@ -3102,24 +3638,24 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 editBtn.style.color = 'white';
                 editBtn.textContent = '🚫 Exit Manual Edit';
                 
-                // Add edit mode indicator to preview
-                const indicator = iframeDoc.createElement('div');
-                indicator.id = 'editModeIndicator';
-                indicator.innerHTML = '✏️ MANUAL EDIT MODE ACTIVE';
-                indicator.style.cssText = `
-                    position: fixed;
-                    top: 10px;
-                    right: 10px;
-                    background: linear-gradient(135deg, #667eea, #764ba2);
-                    color: white;
-                    padding: 8px 16px;
-                    border-radius: 20px;
-                    font-size: 12px;
-                    font-weight: bold;
-                    z-index: 10000;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-                `;
-                iframeDoc.body.appendChild(indicator);
+                // Edit mode indicator removed - no longer showing the indicator overlay
+                // const indicator = iframeDoc.createElement('div');
+                // indicator.id = 'editModeIndicator';
+                // indicator.innerHTML = '✏️ MANUAL EDIT MODE ACTIVE';
+                // indicator.style.cssText = `
+                //     position: fixed;
+                //     top: 10px;
+                //     right: 10px;
+                //     background: linear-gradient(135deg, #667eea, #764ba2);
+                //     color: white;
+                //     padding: 8px 16px;
+                //     border-radius: 20px;
+                //     font-size: 12px;
+                //     font-weight: bold;
+                //     z-index: 10000;
+                //     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                // `;
+                // iframeDoc.body.appendChild(indicator);
                 
                 // Add edit mode styles
                 const style = iframeDoc.createElement('style');
@@ -3154,7 +3690,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 `;
                 iframeDoc.head.appendChild(style);
                 
-                showMessage('assistant', '✏️ Manual Edit Mode activated! Hover over elements to see what you can edit, then right-click to edit.');
+                showToast('✏️ Manual Edit Mode activated! Right-click elements to edit.', 3000);
             } else {
                 // Disable edit mode
                 editBtn.classList.remove('active');
@@ -3162,9 +3698,9 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 editBtn.style.color = '';
                 editBtn.textContent = '✏️ Manual Edit Mode';
                 
-                // Remove edit mode indicator
-                const indicator = iframeDoc.getElementById('editModeIndicator');
-                if (indicator) indicator.remove();
+                // Remove edit mode indicator - commented out since indicator is no longer created
+                // const indicator = iframeDoc.getElementById('editModeIndicator');
+                // if (indicator) indicator.remove();
                 
                 // Remove edit mode styles
                 const style = iframeDoc.getElementById('editModeStyles');
@@ -3182,7 +3718,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 });
                 
                 hideContextMenu();
-                showMessage('assistant', '✏️ Manual Edit Mode deactivated.');
+                showToast('✏️ Manual Edit Mode deactivated.', 2000);
             }
             
             // Re-setup context menu with new mode
@@ -3314,17 +3850,20 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
         }
         
         function handleContextMenu(e) {
+            console.log('handleContextMenu called, isEditMode:', isEditMode);
             // Only handle in edit mode
             if (!isEditMode) return;
             
             e.preventDefault();
             
             const target = e.target;
+            console.log('Context menu target element:', target);
             if (!target || target.tagName === 'BODY' || target.tagName === 'HTML' || target.id === 'editModeIndicator') {
                 return;
             }
             
             contextMenuTarget = target;
+            console.log('contextMenuTarget set to:', contextMenuTarget);
             
             // Don't set selectedElement or switch modes in manual edit mode
             // Manual edit mode is separate from chat's edit mode
@@ -3336,9 +3875,34 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             });
             target.classList.add('element-highlight');
             
-            // Show/hide link option based on element type
+            // Show/hide menu items based on element type
             const linkOption = document.getElementById('editLinkOption');
-            linkOption.style.display = target.tagName === 'A' ? 'block' : 'none';
+            const replaceImageBtn = document.getElementById('replaceImageBtn');
+            const alignButtons = [
+                document.getElementById('alignLeftBtn'),
+                document.getElementById('alignCenterBtn'),
+                document.getElementById('alignRightBtn')
+            ];
+            
+            // Show link option for any element that can be made clickable
+            if (linkOption) {
+                linkOption.style.display = 'block';
+                linkOption.innerHTML = target.tagName === 'A' ? 
+                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; display: inline-block; vertical-align: middle;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> Edit Link' : 
+                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; display: inline-block; vertical-align: middle;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> Make Clickable';
+            }
+            
+            // Show replace image for images or elements with background
+            const hasBackground = window.getComputedStyle(target).backgroundImage !== 'none';
+            if (replaceImageBtn) {
+                replaceImageBtn.style.display = (target.tagName === 'IMG' || hasBackground) ? 'block' : 'none';
+            }
+            
+            // Show alignment based on element type
+            const isTextElement = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'P', 'SPAN', 'DIV', 'SECTION'].includes(target.tagName);
+            alignButtons.forEach(btn => {
+                if (btn) btn.style.display = isTextElement ? 'block' : 'none';
+            });
             
             // Position and show context menu
             const menu = document.getElementById('contextMenu');
@@ -3379,24 +3943,110 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
         }
         
         function editElementText() {
+            console.log('editElementText called, target:', contextMenuTarget);
+            if (!contextMenuTarget) {
+                console.log('No context menu target');
+                return;
+            }
+            
+            // Store the target before hiding menu
+            const target = contextMenuTarget;
             hideContextMenu();
-            if (!contextMenuTarget) return;
             
             document.getElementById('editorTitle').textContent = 'Edit Text Content';
             document.getElementById('editorContent').innerHTML = `
                 <div class="property-group">
                     <label class="property-label">Text Content:</label>
-                    <textarea class="property-input" id="textContent" rows="4">${contextMenuTarget.textContent}</textarea>
+                    <textarea class="property-input" id="textContent" rows="4">${target.textContent}</textarea>
                 </div>
             `;
             document.getElementById('propertyEditor').style.display = 'block';
+            
+            // Store target for apply function
+            contextMenuTarget = target;
         }
         
-        function editElementStyles() {
-            hideContextMenu();
+        // Helper function to parse CSS value and extract number and unit
+        function parseCSSValue(value) {
+            if (!value || value === 'auto' || value === 'none' || value === 'initial' || value === 'inherit') {
+                return { number: '', unit: value || 'auto' };
+            }
+            const match = value.match(/^([\d.]+)(.*)$/);
+            if (match) {
+                return { number: match[1], unit: match[2] || 'px' };
+            }
+            return { number: '', unit: 'px' };
+        }
+
+        // Helper function to create input with unit dropdown
+        function createSizeInput(id, label, value, includeAuto = true) {
+            const parsed = parseCSSValue(value);
+            const units = includeAuto ? 
+                ['px', '%', 'rem', 'em', 'vh', 'vw', 'auto'] : 
+                ['px', '%', 'rem', 'em', 'vh', 'vw'];
+            
+            return `
+                <div class="property-group">
+                    <label class="property-label">${label}:</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" 
+                               class="property-input" 
+                               id="${id}" 
+                               value="${parsed.number}" 
+                               placeholder="Value"
+                               style="flex: 1; ${parsed.unit === 'auto' ? 'display: none;' : ''}"
+                               ${parsed.unit === 'auto' ? 'disabled' : ''}>
+                        <select class="property-input" 
+                                id="${id}Unit" 
+                                style="width: 80px;"
+                                onchange="toggleAutoInput('${id}', this.value)">
+                            ${units.map(u => `<option value="${u}" ${parsed.unit === u ? 'selected' : ''}>${u}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Function to toggle input visibility when 'auto' is selected
+        function toggleAutoInput(inputId, unitValue) {
+            const input = document.getElementById(inputId);
+            if (unitValue === 'auto') {
+                input.style.display = 'none';
+                input.disabled = true;
+                input.value = '';
+            } else {
+                input.style.display = '';
+                input.disabled = false;
+                if (!input.value) input.value = '100';
+            }
+        }
+
+        function editElementSize() {
             if (!contextMenuTarget) return;
             
-            const computedStyles = window.getComputedStyle(contextMenuTarget);
+            const target = contextMenuTarget;
+            const computedStyles = window.getComputedStyle(target);
+            hideContextMenu();
+            
+            document.getElementById('editorTitle').textContent = 'Edit Size';
+            document.getElementById('editorContent').innerHTML = `
+                ${createSizeInput('elementWidth', 'Width', computedStyles.width)}
+                ${createSizeInput('elementHeight', 'Height', computedStyles.height)}
+                ${createSizeInput('minWidth', 'Min Width', computedStyles.minWidth)}
+                ${createSizeInput('minHeight', 'Min Height', computedStyles.minHeight)}
+                ${createSizeInput('maxWidth', 'Max Width', computedStyles.maxWidth)}
+                ${createSizeInput('maxHeight', 'Max Height', computedStyles.maxHeight)}
+            `;
+            document.getElementById('propertyEditor').style.display = 'block';
+            contextMenuTarget = target;
+        }
+
+        function editElementStyles() {
+            if (!contextMenuTarget) return;
+            
+            const target = contextMenuTarget;
+            const computedStyles = window.getComputedStyle(target);
+            hideContextMenu();
             
             document.getElementById('editorTitle').textContent = 'Edit Styles';
             document.getElementById('editorContent').innerHTML = `
@@ -3408,10 +4058,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                     <label class="property-label">Background Color:</label>
                     <input type="color" class="property-input" id="styleBgColor" value="${rgbToHex(computedStyles.backgroundColor)}" style="height: 40px;">
                 </div>
-                <div class="property-group">
-                    <label class="property-label">Font Size:</label>
-                    <input type="text" class="property-input" id="styleFontSize" value="${computedStyles.fontSize}" placeholder="e.g., 16px, 1.2em">
-                </div>
+                ${createSizeInput('styleFontSize', 'Font Size', computedStyles.fontSize, false)}
                 <div class="property-group">
                     <label class="property-label">Font Weight:</label>
                     <select class="property-input" id="styleFontWeight">
@@ -3431,58 +4078,77 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 </div>
             `;
             document.getElementById('propertyEditor').style.display = 'block';
+            contextMenuTarget = target;
         }
         
         function editElementPadding() {
-            hideContextMenu();
             if (!contextMenuTarget) return;
             
-            const computedStyles = window.getComputedStyle(contextMenuTarget);
+            const target = contextMenuTarget;
+            const computedStyles = window.getComputedStyle(target);
+            hideContextMenu();
             
             document.getElementById('editorTitle').textContent = 'Edit Padding & Margin';
             document.getElementById('editorContent').innerHTML = `
-                <div class="property-group">
-                    <label class="property-label">Padding (Top Right Bottom Left):</label>
-                    <input type="text" class="property-input" id="stylePadding" value="${computedStyles.padding}" placeholder="e.g., 10px or 10px 20px">
-                </div>
-                <div class="property-group">
-                    <label class="property-label">Margin (Top Right Bottom Left):</label>
-                    <input type="text" class="property-input" id="styleMargin" value="${computedStyles.margin}" placeholder="e.g., 10px or 10px 20px">
-                </div>
-                <div class="property-group">
-                    <label class="property-label">Border Radius:</label>
-                    <input type="text" class="property-input" id="styleBorderRadius" value="${computedStyles.borderRadius}" placeholder="e.g., 8px or 50%">
-                </div>
+                ${createSizeInput('stylePaddingTop', 'Padding Top', computedStyles.paddingTop, false)}
+                ${createSizeInput('stylePaddingRight', 'Padding Right', computedStyles.paddingRight, false)}
+                ${createSizeInput('stylePaddingBottom', 'Padding Bottom', computedStyles.paddingBottom, false)}
+                ${createSizeInput('stylePaddingLeft', 'Padding Left', computedStyles.paddingLeft, false)}
+                <div style="border-top: 1px solid #e4e4e7; margin: 15px 0;"></div>
+                ${createSizeInput('styleMarginTop', 'Margin Top', computedStyles.marginTop, true)}
+                ${createSizeInput('styleMarginRight', 'Margin Right', computedStyles.marginRight, true)}
+                ${createSizeInput('styleMarginBottom', 'Margin Bottom', computedStyles.marginBottom, true)}
+                ${createSizeInput('styleMarginLeft', 'Margin Left', computedStyles.marginLeft, true)}
+                <div style="border-top: 1px solid #e4e4e7; margin: 15px 0;"></div>
+                ${createSizeInput('styleBorderRadius', 'Border Radius', computedStyles.borderRadius, false)}
             `;
             document.getElementById('propertyEditor').style.display = 'block';
+            contextMenuTarget = target;
         }
         
         function editElementLink() {
+            if (!contextMenuTarget) return;
+            
+            const target = contextMenuTarget;
             hideContextMenu();
-            if (!contextMenuTarget || contextMenuTarget.tagName !== 'A') return;
+            
+            if (target.tagName !== 'A') {
+                // Make element clickable by wrapping in anchor
+                const anchor = document.createElement('a');
+                anchor.href = '#';
+                anchor.target = '_self';
+                target.parentNode.insertBefore(anchor, target);
+                anchor.appendChild(target);
+                contextMenuTarget = anchor;
+                updateHTMLFromPreview();
+                editElementLink();
+                return;
+            }
             
             document.getElementById('editorTitle').textContent = 'Edit Link';
             document.getElementById('editorContent').innerHTML = `
                 <div class="property-group">
                     <label class="property-label">URL:</label>
-                    <input type="url" class="property-input" id="linkHref" value="${contextMenuTarget.href}" placeholder="https://example.com">
+                    <input type="url" class="property-input" id="linkHref" value="${target.href}" placeholder="https://example.com">
                 </div>
                 <div class="property-group">
                     <label class="property-label">Target:</label>
                     <select class="property-input" id="linkTarget">
-                        <option value="_self" ${contextMenuTarget.target === '_self' ? 'selected' : ''}>Same Window</option>
-                        <option value="_blank" ${contextMenuTarget.target === '_blank' ? 'selected' : ''}>New Window</option>
+                        <option value="_self" ${target.target === '_self' ? 'selected' : ''}>Same Window</option>
+                        <option value="_blank" ${target.target === '_blank' ? 'selected' : ''}>New Window</option>
                     </select>
                 </div>
             `;
             document.getElementById('propertyEditor').style.display = 'block';
+            contextMenuTarget = target;
         }
         
         function editElementBackground() {
-            hideContextMenu();
             if (!contextMenuTarget) return;
             
-            const computedStyles = window.getComputedStyle(contextMenuTarget);
+            const target = contextMenuTarget;
+            const computedStyles = window.getComputedStyle(target);
+            hideContextMenu();
             
             document.getElementById('editorTitle').textContent = 'Edit Background';
             document.getElementById('editorContent').innerHTML = `
@@ -3505,31 +4171,663 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 </div>
             `;
             document.getElementById('propertyEditor').style.display = 'block';
+            contextMenuTarget = target;
         }
         
         function duplicateElement() {
-            hideContextMenu();
             if (!contextMenuTarget) return;
             
-            const clone = contextMenuTarget.cloneNode(true);
-            contextMenuTarget.parentNode.insertBefore(clone, contextMenuTarget.nextSibling);
+            const target = contextMenuTarget;
+            hideContextMenu();
+            
+            const clone = target.cloneNode(true);
+            target.parentNode.insertBefore(clone, target.nextSibling);
             
             // Update the HTML editor
             updateHTMLFromPreview();
-            showMessage('assistant', '📋 Element duplicated successfully!');
+            showToast('Element duplicated successfully!', 2000);
         }
         
         function deleteElement() {
-            hideContextMenu();
             if (!contextMenuTarget) return;
             
+            const target = contextMenuTarget;
+            hideContextMenu();
+            
             if (confirm('Are you sure you want to delete this element?')) {
-                contextMenuTarget.remove();
+                target.remove();
                 updateHTMLFromPreview();
-                showMessage('assistant', '🗑️ Element deleted successfully!');
+                showToast('Element deleted successfully!', 2000);
             }
         }
         
+        function initializeContextMenuListeners() {
+            console.log('Initializing context menu listeners...');
+            
+            // Add event listeners for context menu items
+            const editTextBtn = document.getElementById('editTextBtn');
+            const editStylesBtn = document.getElementById('editStylesBtn');
+            const editPaddingBtn = document.getElementById('editPaddingBtn');
+            const editSizeBtn = document.getElementById('editSizeBtn');
+            const editLinkBtn = document.getElementById('editLinkOption');
+            const replaceImageBtn = document.getElementById('replaceImageBtn');
+            const duplicateBtn = document.getElementById('duplicateBtn');
+            const deleteBtn = document.getElementById('deleteBtn');
+            
+            console.log('Found buttons:', {
+                editText: !!editTextBtn,
+                editStyles: !!editStylesBtn,
+                editPadding: !!editPaddingBtn,
+                editSize: !!editSizeBtn,
+                editLink: !!editLinkBtn,
+                replaceImage: !!replaceImageBtn,
+                duplicate: !!duplicateBtn,
+                delete: !!deleteBtn
+            });
+            
+            if (editTextBtn) {
+                editTextBtn.addEventListener('click', (e) => {
+                    console.log('Edit text clicked');
+                    e.stopPropagation();
+                    editElementText();
+                });
+            }
+            if (editStylesBtn) {
+                editStylesBtn.addEventListener('click', (e) => {
+                    console.log('Edit styles clicked');
+                    e.stopPropagation();
+                    editElementStyles();
+                });
+            }
+            if (editPaddingBtn) {
+                editPaddingBtn.addEventListener('click', (e) => {
+                    console.log('Edit padding clicked');
+                    e.stopPropagation();
+                    editElementPadding();
+                });
+            }
+            if (editSizeBtn) {
+                editSizeBtn.addEventListener('click', (e) => {
+                    console.log('Edit size clicked');
+                    e.stopPropagation();
+                    editElementSize();
+                });
+            }
+            if (editLinkBtn) {
+                editLinkBtn.addEventListener('click', (e) => {
+                    console.log('Edit link clicked');
+                    e.stopPropagation();
+                    editElementLink();
+                });
+            }
+            if (replaceImageBtn) {
+                replaceImageBtn.addEventListener('click', (e) => {
+                    console.log('Replace image clicked');
+                    e.stopPropagation();
+                    replaceElementImage();
+                });
+            }
+            if (duplicateBtn) {
+                duplicateBtn.addEventListener('click', (e) => {
+                    console.log('Duplicate clicked');
+                    e.stopPropagation();
+                    duplicateElement();
+                });
+            }
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    console.log('Delete clicked');
+                    e.stopPropagation();
+                    deleteElement();
+                });
+            }
+            
+            // Alignment buttons
+            const alignLeftBtn = document.getElementById('alignLeftBtn');
+            const alignCenterBtn = document.getElementById('alignCenterBtn');
+            const alignRightBtn = document.getElementById('alignRightBtn');
+            
+            if (alignLeftBtn) {
+                alignLeftBtn.addEventListener('click', (e) => {
+                    console.log('Align left clicked');
+                    e.stopPropagation();
+                    alignElement('left');
+                });
+            }
+            if (alignCenterBtn) {
+                alignCenterBtn.addEventListener('click', (e) => {
+                    console.log('Align center clicked');
+                    e.stopPropagation();
+                    alignElement('center');
+                });
+            }
+            if (alignRightBtn) {
+                alignRightBtn.addEventListener('click', (e) => {
+                    console.log('Align right clicked');
+                    e.stopPropagation();
+                    alignElement('right');
+                });
+            }
+            
+            // Reorder buttons
+            const moveUpBtn = document.getElementById('moveUpBtn');
+            const moveDownBtn = document.getElementById('moveDownBtn');
+            
+            if (moveUpBtn) {
+                moveUpBtn.addEventListener('click', (e) => {
+                    console.log('Move up clicked');
+                    e.stopPropagation();
+                    moveElementUp();
+                });
+            }
+            if (moveDownBtn) {
+                moveDownBtn.addEventListener('click', (e) => {
+                    console.log('Move down clicked');
+                    e.stopPropagation();
+                    moveElementDown();
+                });
+            }
+            
+            // Responsive buttons
+            const hideMobileBtn = document.getElementById('hideMobileBtn');
+            const hideDesktopBtn = document.getElementById('hideDesktopBtn');
+            
+            if (hideMobileBtn) {
+                hideMobileBtn.addEventListener('click', (e) => {
+                    console.log('Hide mobile clicked');
+                    e.stopPropagation();
+                    toggleMobileVisibility();
+                });
+            }
+            if (hideDesktopBtn) {
+                hideDesktopBtn.addEventListener('click', (e) => {
+                    console.log('Hide desktop clicked');
+                    e.stopPropagation();
+                    toggleDesktopVisibility();
+                });
+            }
+            
+            // AI buttons
+            const aiRefineBtn = document.getElementById('aiRefineBtn');
+            const aiAlternativeBtn = document.getElementById('aiAlternativeBtn');
+            
+            if (aiRefineBtn) {
+                aiRefineBtn.addEventListener('click', (e) => {
+                    console.log('AI refine clicked');
+                    e.stopPropagation();
+                    aiRefineElement();
+                });
+            }
+            if (aiAlternativeBtn) {
+                aiAlternativeBtn.addEventListener('click', (e) => {
+                    console.log('AI alternative clicked');
+                    e.stopPropagation();
+                    aiGenerateAlternative();
+                });
+            }
+            
+            console.log('Context menu listeners initialized');
+        }
+        
+        // Helper function to extract design context from the page
+        function getDesignContext() {
+            const iframeDoc = document.getElementById('previewFrame').contentDocument;
+            const computedStyles = iframeDoc.defaultView.getComputedStyle(iframeDoc.body);
+            
+            // Extract colors from the page
+            const colors = new Set();
+            const elements = iframeDoc.querySelectorAll('*');
+            elements.forEach(el => {
+                const style = iframeDoc.defaultView.getComputedStyle(el);
+                if (style.color) colors.add(style.color);
+                if (style.backgroundColor && style.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                    colors.add(style.backgroundColor);
+                }
+            });
+            
+            // Get font families
+            const fonts = new Set();
+            elements.forEach(el => {
+                const style = iframeDoc.defaultView.getComputedStyle(el);
+                if (style.fontFamily) fonts.add(style.fontFamily);
+            });
+            
+            // Get current CSS
+            const currentCSS = document.getElementById('cssEditor').value;
+            
+            // Get brand guidelines
+            const brandGuidelines = document.getElementById('brandGuidelines')?.value || '';
+            
+            return {
+                bodyFont: computedStyles.fontFamily,
+                bodyColor: computedStyles.color,
+                bodyBg: computedStyles.backgroundColor,
+                colors: Array.from(colors).slice(0, 5), // Top 5 colors
+                fonts: Array.from(fonts).slice(0, 3), // Top 3 fonts
+                currentCSS: currentCSS.substring(0, 500), // First 500 chars of CSS
+                brandGuidelines: brandGuidelines
+            };
+        }
+        
+        // Helper to analyze element context
+        function getElementContext(element) {
+            const parent = element.parentElement;
+            const siblings = Array.from(parent?.children || []).filter(el => el !== element);
+            const elementStyles = window.getComputedStyle(element);
+            
+            // Determine element role
+            let role = 'content';
+            const tag = element.tagName.toLowerCase();
+            const classes = element.className.toLowerCase();
+            
+            if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tag)) {
+                role = 'heading';
+            } else if (tag === 'button' || classes.includes('button') || classes.includes('btn')) {
+                role = 'button';
+            } else if (classes.includes('card')) {
+                role = 'card';
+            } else if (tag === 'nav' || classes.includes('nav')) {
+                role = 'navigation';
+            } else if (tag === 'header' || classes.includes('header')) {
+                role = 'header';
+            } else if (tag === 'footer' || classes.includes('footer')) {
+                role = 'footer';
+            } else if (tag === 'img') {
+                role = 'image';
+            } else if (tag === 'p') {
+                role = 'paragraph';
+            } else if (tag === 'a') {
+                role = 'link';
+            }
+            
+            return {
+                role: role,
+                tag: tag,
+                hasText: element.textContent.trim().length > 0,
+                hasBg: elementStyles.backgroundColor !== 'rgba(0, 0, 0, 0)',
+                fontSize: elementStyles.fontSize,
+                fontFamily: elementStyles.fontFamily,
+                color: elementStyles.color,
+                parentTag: parent?.tagName.toLowerCase(),
+                siblingCount: siblings.length,
+                isInGrid: elementStyles.display === 'grid' || parent?.style.display === 'grid',
+                isInFlex: elementStyles.display === 'flex' || parent?.style.display === 'flex'
+            };
+        }
+        
+        // New context menu functions for last-mile adjustments
+        function alignElement(alignment) {
+            if (!contextMenuTarget) return;
+            
+            const target = contextMenuTarget;
+            hideContextMenu();
+            
+            // Apply alignment based on element type
+            const tagName = target.tagName.toLowerCase();
+            
+            if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a'].includes(tagName)) {
+                // Text elements - use text-align
+                target.style.textAlign = alignment;
+            } else {
+                // Block elements - use margin auto for centering
+                if (alignment === 'center') {
+                    target.style.marginLeft = 'auto';
+                    target.style.marginRight = 'auto';
+                    target.style.display = 'block';
+                } else if (alignment === 'left') {
+                    target.style.marginLeft = '0';
+                    target.style.marginRight = 'auto';
+                } else if (alignment === 'right') {
+                    target.style.marginLeft = 'auto';
+                    target.style.marginRight = '0';
+                }
+            }
+            
+            updateHTMLFromPreview();
+            showToast(`↔️ Aligned ${alignment}`, 1500);
+        }
+        
+        function moveElementUp() {
+            if (!contextMenuTarget) return;
+            
+            const target = contextMenuTarget;
+            hideContextMenu();
+            
+            const prev = target.previousElementSibling;
+            if (prev) {
+                target.parentNode.insertBefore(target, prev);
+                updateHTMLFromPreview();
+                showToast('⬆️ Moved up', 1500);
+            } else {
+                showToast('Already at the top', 1500);
+            }
+        }
+        
+        function moveElementDown() {
+            if (!contextMenuTarget) return;
+            
+            const target = contextMenuTarget;
+            hideContextMenu();
+            
+            const next = target.nextElementSibling;
+            if (next) {
+                target.parentNode.insertBefore(next, target);
+                updateHTMLFromPreview();
+                showToast('⬇️ Moved down', 1500);
+            } else {
+                showToast('Already at the bottom', 1500);
+            }
+        }
+        
+        function toggleMobileVisibility() {
+            if (!contextMenuTarget) return;
+            
+            const target = contextMenuTarget;
+            hideContextMenu();
+            
+            // Add/remove a class that hides on mobile
+            if (target.classList.contains('hide-mobile')) {
+                target.classList.remove('hide-mobile');
+                showToast('Visible on mobile', 1500);
+            } else {
+                target.classList.add('hide-mobile');
+                // Add CSS if not exists
+                addResponsiveCSS();
+                showToast('Hidden on mobile', 1500);
+            }
+            
+            updateHTMLFromPreview();
+        }
+        
+        function toggleDesktopVisibility() {
+            if (!contextMenuTarget) return;
+            
+            const target = contextMenuTarget;
+            hideContextMenu();
+            
+            // Add/remove a class that hides on desktop
+            if (target.classList.contains('hide-desktop')) {
+                target.classList.remove('hide-desktop');
+                showToast('Visible on desktop', 1500);
+            } else {
+                target.classList.add('hide-desktop');
+                // Add CSS if not exists
+                addResponsiveCSS();
+                showToast('Hidden on desktop', 1500);
+            }
+            
+            updateHTMLFromPreview();
+        }
+        
+        function addResponsiveCSS() {
+            // Check if responsive CSS already exists
+            const cssEditor = document.getElementById('cssEditor');
+            const currentCSS = cssEditor.value;
+            
+            if (!currentCSS.includes('.hide-mobile')) {
+                const responsiveCSS = `
+/* Responsive visibility classes */
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .hide-desktop {
+        display: none !important;
+    }
+}`;
+                cssEditor.value = currentCSS + responsiveCSS;
+                currentCSS = cssEditor.value;
+                updatePreview();
+            }
+        }
+        
+        function replaceElementImage() {
+            if (!contextMenuTarget) return;
+            
+            const target = contextMenuTarget;
+            hideContextMenu();
+            
+            // Check if element is an image or has background image
+            if (target.tagName === 'IMG') {
+                // Show image generation dialog for replacement
+                showImageGenerationDialog(true);
+                // Store target for later use
+                window.imageReplacementTarget = target;
+            } else {
+                // Check for background image
+                editElementBackground();
+            }
+        }
+        
+        async function aiRefineElement() {
+            if (!contextMenuTarget) return;
+            
+            const target = contextMenuTarget;
+            const elementHTML = target.outerHTML;
+            hideContextMenu();
+            
+            // Show loading state
+            showToast('🤖 AI refining element...', 2000);
+            
+            // Gather context
+            const designContext = getDesignContext();
+            const elementContext = getElementContext(target);
+            
+            // Create a comprehensive prompt
+            const prompt = `Refine this ${elementContext.role} element to better fit the page design.
+
+CURRENT ELEMENT:
+${elementHTML}
+
+ELEMENT CONTEXT:
+- Role: ${elementContext.role}
+- Parent: ${elementContext.parentTag || 'none'}
+- Siblings: ${elementContext.siblingCount} other elements
+- Layout: ${elementContext.isInFlex ? 'Flexbox' : elementContext.isInGrid ? 'Grid' : 'Block'}
+
+DESIGN SYSTEM:
+- Primary colors: ${designContext.colors.slice(0, 3).join(', ')}
+- Fonts in use: ${designContext.fonts.join(', ')}
+- Body font: ${designContext.bodyFont}
+
+${designContext.brandGuidelines ? `BRAND GUIDELINES:\n${designContext.brandGuidelines}\n` : ''}
+
+REFINEMENT GOALS:
+1. Improve visual hierarchy and readability
+2. Ensure consistency with other elements on the page
+3. Enhance spacing and alignment
+4. Make it more modern and professional
+5. Maintain semantic HTML and accessibility
+6. Keep the same content and functionality
+
+Return ONLY the refined HTML element. Do not include explanations or markdown code blocks.`;
+            
+            // Send to AI for refinement
+            const apiKey = document.getElementById('apiKey').value;
+            if (!apiKey) {
+                alert('Please add your API key first');
+                return;
+            }
+            
+            try {
+                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                        'HTTP-Referer': window.location.href,
+                        'X-Title': 'VibeCoder'
+                    },
+                    body: JSON.stringify({
+                        model: document.getElementById('modelSelect').value,
+                        messages: [
+                            { role: 'system', content: 'You are an expert web designer specializing in modern, clean UI refinements. You understand design systems, visual hierarchy, and accessibility. You make thoughtful improvements while maintaining consistency with existing designs. Always return valid HTML without markdown formatting.' },
+                            { role: 'user', content: prompt }
+                        ]
+                    })
+                });
+                
+                const data = await response.json();
+                let improvedHTML = data.choices[0].message.content;
+                
+                // Extract HTML from code blocks if present
+                if (improvedHTML.includes('```html')) {
+                    improvedHTML = improvedHTML.split('```html')[1].split('```')[0].trim();
+                } else if (improvedHTML.includes('```')) {
+                    improvedHTML = improvedHTML.split('```')[1].split('```')[0].trim();
+                }
+                
+                // Replace the element with improved version
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = improvedHTML.trim();
+                const newElement = tempDiv.firstChild;
+                
+                if (newElement) {
+                    target.parentNode.replaceChild(newElement, target);
+                    updateHTMLFromPreview();
+                    showToast('Element refined by AI', 2000);
+                }
+            } catch (error) {
+                console.error('AI refinement error:', error);
+                showToast('❌ AI refinement failed', 2000);
+            }
+        }
+        
+        async function aiGenerateAlternative() {
+            if (!contextMenuTarget) return;
+            
+            const target = contextMenuTarget;
+            const elementHTML = target.outerHTML;
+            hideContextMenu();
+            
+            // Show loading state
+            showToast('Generating alternative...', 2000);
+            
+            // Gather context
+            const designContext = getDesignContext();
+            const elementContext = getElementContext(target);
+            
+            // Determine appropriate variations based on element role
+            let variations = '';
+            switch(elementContext.role) {
+                case 'heading':
+                    variations = '1. Bold statement style with larger size\n2. Subtle elegant style with lighter weight\n3. Accented style with color or underline\n4. Compact style with tighter spacing';
+                    break;
+                case 'button':
+                    variations = '1. Solid filled button\n2. Outlined/ghost button\n3. Gradient or animated button\n4. Text-only link style';
+                    break;
+                case 'card':
+                    variations = '1. Elevated card with shadow\n2. Bordered flat card\n3. Gradient or colored card\n4. Minimal no-border card';
+                    break;
+                case 'paragraph':
+                    variations = '1. Emphasized with background\n2. Quote/callout style\n3. Multi-column layout\n4. With decorative elements';
+                    break;
+                default:
+                    variations = '1. Modern minimalist style\n2. Bold and prominent style\n3. Soft and subtle style\n4. Decorated/accented style';
+            }
+            
+            // Create comprehensive prompt
+            const prompt = `Generate an alternative version of this ${elementContext.role} element with a different visual style.
+
+CURRENT ELEMENT:
+${elementHTML}
+
+ELEMENT CONTEXT:
+- Role: ${elementContext.role}
+- Current style: ${elementContext.fontSize} font, ${elementContext.color} color
+- Parent: ${elementContext.parentTag || 'none'}
+- Layout context: ${elementContext.isInFlex ? 'Flexbox' : elementContext.isInGrid ? 'Grid' : 'Block'}
+
+DESIGN TOKENS AVAILABLE:
+- Colors: ${designContext.colors.slice(0, 5).join(', ')}
+- Fonts: ${designContext.fonts.join(', ')}
+- Base font: ${designContext.bodyFont}
+
+${designContext.brandGuidelines ? `BRAND GUIDELINES:\n${designContext.brandGuidelines}\n` : ''}
+
+VARIATION OPTIONS (choose one):
+${variations}
+
+REQUIREMENTS:
+1. Keep the exact same content and functionality
+2. Maintain semantic HTML structure
+3. Create a noticeably different visual style
+4. Stay within the design system colors and fonts
+5. Ensure accessibility is maintained
+6. Make it feel fresh but still cohesive with the page
+
+Return ONLY the alternative HTML element. Do not include explanations or markdown code blocks.`;
+            
+            // Send to AI for alternative
+            const apiKey = document.getElementById('apiKey').value;
+            if (!apiKey) {
+                alert('Please add your API key first');
+                return;
+            }
+            
+            try {
+                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                        'HTTP-Referer': window.location.href,
+                        'X-Title': 'VibeCoder'
+                    },
+                    body: JSON.stringify({
+                        model: document.getElementById('modelSelect').value,
+                        messages: [
+                            { role: 'system', content: 'You are a creative web designer who creates thoughtful variations of UI elements. You understand how to create distinct visual alternatives while maintaining design system consistency and functionality. You respect brand guidelines and accessibility. Always return valid HTML without markdown formatting.' },
+                            { role: 'user', content: prompt }
+                        ]
+                    })
+                });
+                
+                const data = await response.json();
+                let alternativeHTML = data.choices[0].message.content;
+                
+                // Extract HTML from code blocks if present
+                if (alternativeHTML.includes('```html')) {
+                    alternativeHTML = alternativeHTML.split('```html')[1].split('```')[0].trim();
+                } else if (alternativeHTML.includes('```')) {
+                    alternativeHTML = alternativeHTML.split('```')[1].split('```')[0].trim();
+                }
+                
+                // Replace with alternative version
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = alternativeHTML.trim();
+                const newElement = tempDiv.firstChild;
+                
+                if (newElement) {
+                    target.parentNode.replaceChild(newElement, target);
+                    updateHTMLFromPreview();
+                    showToast('Alternative generated', 2000);
+                }
+            } catch (error) {
+                console.error('Alternative generation error:', error);
+                showToast('❌ Generation failed', 2000);
+            }
+        }
+        
+        // Helper function to get value with unit
+        function getValueWithUnit(id) {
+            const input = document.getElementById(id);
+            const unitSelect = document.getElementById(id + 'Unit');
+            
+            if (!input || !unitSelect) return '';
+            
+            const unit = unitSelect.value;
+            if (unit === 'auto') {
+                return 'auto';
+            }
+            
+            const value = input.value;
+            return value ? value + unit : '';
+        }
+
         function applyPropertyEdit() {
             if (!contextMenuTarget) return;
             
@@ -3538,15 +4836,56 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             
             if (title.includes('Text')) {
                 contextMenuTarget.textContent = document.getElementById('textContent').value;
+            } else if (title.includes('Size')) {
+                // Apply size properties
+                const width = getValueWithUnit('elementWidth');
+                const height = getValueWithUnit('elementHeight');
+                const minWidth = getValueWithUnit('minWidth');
+                const minHeight = getValueWithUnit('minHeight');
+                const maxWidth = getValueWithUnit('maxWidth');
+                const maxHeight = getValueWithUnit('maxHeight');
+                
+                if (width) contextMenuTarget.style.width = width;
+                if (height) contextMenuTarget.style.height = height;
+                if (minWidth) contextMenuTarget.style.minWidth = minWidth;
+                if (minHeight) contextMenuTarget.style.minHeight = minHeight;
+                if (maxWidth) contextMenuTarget.style.maxWidth = maxWidth;
+                if (maxHeight) contextMenuTarget.style.maxHeight = maxHeight;
             } else if (title.includes('Styles')) {
                 contextMenuTarget.style.color = document.getElementById('styleColor').value;
                 contextMenuTarget.style.backgroundColor = document.getElementById('styleBgColor').value;
-                contextMenuTarget.style.fontSize = document.getElementById('styleFontSize').value;
-                contextMenuTarget.style.fontWeight = document.getElementById('styleFontWeight').value;
+                
+                const fontSize = getValueWithUnit('styleFontSize');
+                if (fontSize) contextMenuTarget.style.fontSize = fontSize;
+                
+                const fontWeight = document.getElementById('styleFontWeight');
+                if (fontWeight) contextMenuTarget.style.fontWeight = fontWeight.value;
             } else if (title.includes('Padding')) {
-                contextMenuTarget.style.padding = document.getElementById('stylePadding').value;
-                contextMenuTarget.style.margin = document.getElementById('styleMargin').value;
-                contextMenuTarget.style.borderRadius = document.getElementById('styleBorderRadius').value;
+                // Apply padding properties
+                const paddingTop = getValueWithUnit('stylePaddingTop');
+                const paddingRight = getValueWithUnit('stylePaddingRight');
+                const paddingBottom = getValueWithUnit('stylePaddingBottom');
+                const paddingLeft = getValueWithUnit('stylePaddingLeft');
+                
+                if (paddingTop) contextMenuTarget.style.paddingTop = paddingTop;
+                if (paddingRight) contextMenuTarget.style.paddingRight = paddingRight;
+                if (paddingBottom) contextMenuTarget.style.paddingBottom = paddingBottom;
+                if (paddingLeft) contextMenuTarget.style.paddingLeft = paddingLeft;
+                
+                // Apply margin properties
+                const marginTop = getValueWithUnit('styleMarginTop');
+                const marginRight = getValueWithUnit('styleMarginRight');
+                const marginBottom = getValueWithUnit('styleMarginBottom');
+                const marginLeft = getValueWithUnit('styleMarginLeft');
+                
+                if (marginTop) contextMenuTarget.style.marginTop = marginTop;
+                if (marginRight) contextMenuTarget.style.marginRight = marginRight;
+                if (marginBottom) contextMenuTarget.style.marginBottom = marginBottom;
+                if (marginLeft) contextMenuTarget.style.marginLeft = marginLeft;
+                
+                // Apply border radius
+                const borderRadius = getValueWithUnit('styleBorderRadius');
+                if (borderRadius) contextMenuTarget.style.borderRadius = borderRadius;
             } else if (title.includes('Link')) {
                 contextMenuTarget.href = document.getElementById('linkHref').value;
                 contextMenuTarget.target = document.getElementById('linkTarget').value;
@@ -3565,7 +4904,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             // Close the editor
             cancelPropertyEdit();
             
-            showMessage('assistant', '✅ Element updated successfully!');
+            showToast('✅ Element updated successfully!', 2000);
         }
         
         function cancelPropertyEdit() {
@@ -3936,7 +5275,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 }
                 
                 // Show success message
-                showMessage('assistant', '✅ Chat history cleared. Your code has been preserved.');
+                showToast('✅ Chat history cleared. Your code has been preserved.', 3000);
                 
                 // Note: We keep currentHTML and currentCSS intact
                 // The preview and code editors maintain their content
@@ -3996,10 +5335,10 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             { emoji: '🏗️', text: 'Build landing page with sections', tooltip: 'Start with a complete page structure' },
             { emoji: '📸', text: 'Recreate from my screenshot', tooltip: 'Upload a screenshot to recreate' },
             { emoji: '🔧', text: 'Debug and improve my code', tooltip: 'Fix issues in existing code' },
-            { emoji: '✨', text: 'Add dark mode to my site', tooltip: 'Add new functionality' },
-            { emoji: '📱', text: 'Make my design mobile-friendly', tooltip: 'Make responsive for all devices' },
-            { emoji: '🎨', text: 'Add animations and effects', tooltip: 'Add smooth animations' },
-            { emoji: '🔄', text: 'Convert HTML to Oxygen', tooltip: 'Convert to Oxygen format' },
+            { emoji: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>', text: 'Add dark mode to my site', tooltip: 'Add new functionality' },
+            { emoji: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>', text: 'Make my design mobile-friendly', tooltip: 'Make responsive for all devices' },
+            { emoji: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path><path d="M12 2a10 10 0 0 1 0 20"></path></svg>', text: 'Add animations and effects', tooltip: 'Add smooth animations' },
+            { emoji: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>', text: 'Convert HTML to Oxygen', tooltip: 'Convert to Oxygen format' },
             { emoji: '⚡', text: 'Optimize for speed and SEO', tooltip: 'Improve performance' }
         ];
         
@@ -4257,16 +5596,10 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 z-index: 100001;
                 font-size: 14px;
                 font-weight: 500;
-                display: flex;
-                align-items: center;
-                gap: 8px;
                 animation: slideDown 0.3s ease-out;
             `;
             
-            toast.innerHTML = `
-                <span style="font-size: 18px;">🎯</span>
-                <span>${message}</span>
-            `;
+            toast.innerHTML = `<span>${message}</span>`;
             
             // Add animation
             const style = document.createElement('style');
@@ -4364,7 +5697,10 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 }
                 
                 selectionMsg.innerHTML = `
-                    <span style="font-size: 18px;">🎯</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m11-11h-6m-6 0H1"></path>
+                </svg>
                     <div style="flex: 1;">
                         <div style="font-size: 12px; color: #71717a; font-weight: 600;">Selected Element</div>
                         <div style="font-size: 14px; color: #09090b; margin-top: 4px;">
@@ -4671,7 +6007,8 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                     title: doc.title || 'Untitled'
                 };
                 
-                showMessage('assistant', `✅ Successfully fetched "${referenceData.title}". The website structure has been loaded as reference. Now describe what elements you want to recreate.`);
+                showToast(`✅ Successfully fetched "${referenceData.title}"`, 3000);
+                showMessage('assistant', 'The website structure has been loaded as reference. Now describe what elements you want to recreate.');
                 
                 // Focus on the input
                 document.getElementById('userInput').focus();
@@ -4695,6 +6032,46 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
         
         let attachedImageData = null;
         
+        // Function to compress and resize images
+        async function compressAndResizeImage(dataUrl, maxWidth = 1024, maxHeight = 1024, quality = 0.85) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = function() {
+                    // Calculate new dimensions while maintaining aspect ratio
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth || height > maxHeight) {
+                        const aspectRatio = width / height;
+                        
+                        if (width > height) {
+                            width = maxWidth;
+                            height = Math.round(maxWidth / aspectRatio);
+                        } else {
+                            height = maxHeight;
+                            width = Math.round(maxHeight * aspectRatio);
+                        }
+                    }
+                    
+                    // Create canvas for resizing
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Convert to JPEG with compression
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    
+                    console.log(`Image compressed: ${img.width}x${img.height} -> ${width}x${height}, Size reduction: ${Math.round((1 - compressedDataUrl.length / dataUrl.length) * 100)}%`);
+                    
+                    resolve(compressedDataUrl);
+                };
+                img.src = dataUrl;
+            });
+        }
+        
         function attachImage() {
             document.getElementById('imageInput').click();
         }
@@ -4709,8 +6086,10 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             }
             
             const reader = new FileReader();
-            reader.onload = function(e) {
-                attachedImageData = e.target.result;
+            reader.onload = async function(e) {
+                // Compress the image before storing
+                const uncompressedData = e.target.result;
+                attachedImageData = await compressAndResizeImage(uncompressedData, 1024, 1024, 0.85);
                 
                 // Show indicator that image is attached
                 const attachBtn = document.querySelector('.attach-image-button');
@@ -4724,7 +6103,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                     textarea.value += textarea.value ? '\n[Image attached]' : '[Image attached]';
                 }
                 
-                showMessage('assistant', '📎 Image attached! Add your message and send.');
+                showMessage('assistant', '📎 Image attached and compressed! Add your message and send.');
             };
             reader.readAsDataURL(file);
         }
@@ -4748,7 +6127,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             const previewFrame = document.getElementById('previewFrame');
             
             try {
-                showMessage('assistant', '📸 Capturing preview screenshot...');
+                showToast('📸 Capturing preview screenshot...', 2000);
                 
                 // Use html2canvas library to capture the iframe content
                 if (typeof html2canvas === 'undefined') {
@@ -4782,10 +6161,14 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 
                 document.body.removeChild(tempContainer);
                 
-                return canvas.toDataURL('image/png');
+                // Compress the screenshot before returning
+                const uncompressedDataUrl = canvas.toDataURL('image/png');
+                const compressedDataUrl = await compressAndResizeImage(uncompressedDataUrl, 1024, 1024, 0.85);
+                
+                return compressedDataUrl;
             } catch (error) {
                 console.error('Screenshot error:', error);
-                showMessage('assistant', '❌ Failed to capture screenshot. Please try again.');
+                showToast('❌ Failed to capture screenshot. Please try again.', 3000);
                 return null;
             }
         }
@@ -4797,7 +6180,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 // Show loading state
                 document.getElementById('sendButton').disabled = true;
                 document.getElementById('loadingIndicator').classList.add('active');
-                showMessage('assistant', '📸 Capturing preview screenshot...');
+                showToast('📸 Capturing preview screenshot...', 2000);
                 
                 // Use html2canvas library to capture the iframe content
                 // First, we need to inject html2canvas if not already loaded
@@ -4840,10 +6223,11 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 // Remove temporary container
                 document.body.removeChild(tempContainer);
                 
-                // Convert canvas to base64
-                const imageData = canvas.toDataURL('image/png');
+                // Convert canvas to base64 and compress
+                const uncompressedData = canvas.toDataURL('image/png');
+                const imageData = await compressAndResizeImage(uncompressedData, 1024, 1024, 0.85);
                 
-                // Send to AI with the screenshot
+                // Send to AI with the compressed screenshot
                 await sendMessageWithImage(imageData);
                 
             } catch (error) {
@@ -4924,14 +6308,27 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                     // Add tabs at the top
                     const tabsHTML = `
                         <div class="image-tabs" style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
-                            <button id="uploadTabBtn" onclick="switchImageTab('upload')" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px 6px 0 0; cursor: pointer; font-weight: bold;">
+                            <button id="galleryTabBtn" onclick="switchImageTab('gallery')" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px 6px 0 0; cursor: pointer; font-weight: bold;">
+                                🖼️ Gallery
+                            </button>
+                            <button id="uploadTabBtn" onclick="switchImageTab('upload')" style="padding: 8px 16px; background: #f0f0f0; color: #333; border: none; border-radius: 6px 6px 0 0; cursor: pointer;">
                                 📤 Upload Image
                             </button>
                             <button id="generateTabBtn" onclick="switchImageTab('generate')" style="padding: 8px 16px; background: #f0f0f0; color: #333; border: none; border-radius: 6px 6px 0 0; cursor: pointer;">
-                                🎨 Generate with AI
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; display: inline-block; vertical-align: middle;">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                                Generate with AI
                             </button>
                         </div>
-                        <div id="uploadTabContent" style="display: block;">
+                        <div id="galleryTabContent" style="display: block;">
+                            <h3 style="margin: 0 0 20px 0; color: #333;">🖼️ Choose from Gallery</h3>
+                            <div id="dialogMediaGalleryTab" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 300px; overflow-y: auto; padding: 10px; border: 1px solid #e4e4e7; border-radius: 8px; background: #fafafa;">
+                                <!-- Gallery images will be loaded here -->
+                            </div>
+                            <p id="noGalleryImagesTab" style="text-align: center; color: #999; font-size: 14px; margin: 20px 0; display: none;">No images in gallery yet. Generate some images first!</p>
+                        </div>
+                        <div id="uploadTabContent" style="display: none;">
                             <h3 style="margin: 0 0 20px 0; color: #333;">📤 Upload Your Image</h3>
                             <div style="margin-bottom: 20px;">
                                 <input type="file" id="directImageUpload" accept="image/*" onchange="handleDirectImageUpload(this)" style="display: none;">
@@ -4948,19 +6345,79 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                     const h2 = dialogContent.querySelector('h2');
                     h2.insertAdjacentHTML('afterend', tabsHTML);
                     
-                    // Wrap existing generation content
+                    // Move buttons to the bottom, outside tabs
+                    const buttonsDiv = dialogContent.querySelector('div[style*="justify-content: flex-end"]');
+                    if (buttonsDiv) {
+                        // Remove from current position and append at the end
+                        buttonsDiv.remove();
+                        dialogContent.appendChild(buttonsDiv);
+                    }
+                    
+                    // Wrap existing generation content (excluding buttons)
                     const existingContent = Array.from(dialogContent.children).slice(3); // Skip h2 and tabs
                     const generateWrapper = document.createElement('div');
                     generateWrapper.innerHTML = '</div>';
                     existingContent.forEach(el => {
-                        if (!el.classList.contains('image-tabs') && el.id !== 'uploadTabContent' && el.id !== 'generateTabContent') {
+                        if (!el.classList.contains('image-tabs') && 
+                            el.id !== 'uploadTabContent' && 
+                            el.id !== 'generateTabContent' &&
+                            el.id !== 'galleryTabContent' &&
+                            !el.querySelector('#generateImageButton') &&
+                            !el.querySelector('#insertImageButton')) {
                             generateWrapper.appendChild(el);
                         }
                     });
                 }
                 
-                // Show upload tab by default when from context menu
-                switchImageTab('upload');
+                // Populate the gallery tab
+                const dialogGalleryTab = document.getElementById('dialogMediaGalleryTab');
+                const noGalleryMsgTab = document.getElementById('noGalleryImagesTab');
+                
+                if (dialogGalleryTab && generatedImages.length > 0) {
+                    dialogGalleryTab.innerHTML = generatedImages.map((img, index) => `
+                        <div style="position: relative; cursor: pointer; border: 2px solid transparent; border-radius: 4px; transition: all 0.2s; padding: 4px;"
+                             onclick="selectGalleryImage('${img.url.replace(/'/g, "\\'")}')" 
+                             onmouseover="this.style.borderColor='#667eea'; this.style.transform='scale(1.05)'" 
+                             onmouseout="if(this.style.backgroundColor !== 'rgba(102, 126, 234, 0.1)') { this.style.borderColor='transparent'; this.style.transform='scale(1)' }">
+                            <img src="${img.url}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 4px; pointer-events: none;" 
+                                 title="${(img.prompt || 'Generated image').replace(/"/g, '&quot;')}" />
+                        </div>
+                    `).join('');
+                    dialogGalleryTab.style.display = 'grid';
+                    if (noGalleryMsgTab) noGalleryMsgTab.style.display = 'none';
+                } else if (dialogGalleryTab) {
+                    dialogGalleryTab.innerHTML = '';
+                    dialogGalleryTab.style.display = 'none';
+                    if (noGalleryMsgTab) noGalleryMsgTab.style.display = 'block';
+                }
+                
+                // Show gallery tab by default when from context menu (if images exist)
+                if (generatedImages.length > 0) {
+                    switchImageTab('gallery');
+                } else {
+                    switchImageTab('upload');
+                }
+            }
+            
+            // Populate gallery with generated images
+            const dialogGallery = document.getElementById('dialogMediaGallery');
+            const noGalleryMsg = document.getElementById('noGalleryImages');
+            
+            if (dialogGallery && generatedImages.length > 0) {
+                dialogGallery.innerHTML = generatedImages.map((img, index) => `
+                    <div style="position: relative; cursor: pointer; border: 2px solid transparent; border-radius: 4px; transition: all 0.2s;"
+                         onclick="selectGalleryImage('${img.url.replace(/'/g, "\\'")}')" 
+                         onmouseover="this.style.borderColor='#667eea'" 
+                         onmouseout="this.style.borderColor='transparent'">
+                        <img src="${img.url}" style="width: 100%; height: 80px; object-fit: cover; border-radius: 4px;" 
+                             title="${(img.prompt || 'Generated image').replace(/"/g, '&quot;')}" />
+                    </div>
+                `).join('');
+                dialogGallery.style.display = 'grid';
+                if (noGalleryMsg) noGalleryMsg.style.display = 'none';
+            } else if (dialogGallery) {
+                dialogGallery.style.display = 'none';
+                if (noGalleryMsg) noGalleryMsg.style.display = 'block';
             }
             
             // Reset the dialog state
@@ -4974,13 +6431,91 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             selectedImageFiles = [];
         }
         
+        function selectGalleryImage(imageUrl) {
+            // Set the selected image as the generated image
+            generatedImageData = imageUrl;
+            
+            // Show preview
+            const previewImg = document.getElementById('generatedImagePreview');
+            const resultDiv = document.getElementById('imageGenResult');
+            if (previewImg && resultDiv) {
+                previewImg.src = imageUrl;
+                resultDiv.style.display = 'block';
+            }
+            
+            // Hide generate button, show insert button
+            const generateBtn = document.getElementById('generateImageButton');
+            const insertBtn = document.getElementById('insertImageButton');
+            const loadingDiv = document.getElementById('imageGenLoading');
+            
+            if (loadingDiv) loadingDiv.style.display = 'none';
+            if (generateBtn) {
+                generateBtn.style.display = 'none';
+            }
+            if (insertBtn) {
+                insertBtn.style.display = 'inline-block';
+                insertBtn.style.visibility = 'visible';
+                // Ensure the button's parent is also visible
+                if (insertBtn.parentElement) {
+                    insertBtn.parentElement.style.display = 'flex';
+                }
+                console.log('Insert button should now be visible');
+            } else {
+                console.error('Insert button not found in DOM');
+            }
+            
+            // Add visual feedback to selected image
+            const galleryImages = document.querySelectorAll('#dialogMediaGalleryTab > div');
+            galleryImages.forEach(div => {
+                const imgSrc = div.querySelector('img')?.src;
+                if (imgSrc === imageUrl) {
+                    div.style.borderColor = '#667eea';
+                    div.style.backgroundColor = 'rgba(102, 126, 234, 0.1)';
+                } else {
+                    div.style.borderColor = 'transparent';
+                    div.style.backgroundColor = 'transparent';
+                }
+            });
+            
+            // Visual feedback
+            showToast('✅ Image selected! Click "Insert Image" to apply.', 3000);
+            
+            // Also ensure cancel button is visible
+            const cancelBtn = document.querySelector('#imageGenDialog button[onclick="closeImageGenDialog()"]');
+            if (cancelBtn) cancelBtn.style.display = 'inline-block';
+        }
+        
         function switchImageTab(tab) {
+            const galleryTab = document.getElementById('galleryTabContent');
             const uploadTab = document.getElementById('uploadTabContent');
             const generateTab = document.getElementById('generateTabContent');
+            const galleryBtn = document.getElementById('galleryTabBtn');
             const uploadBtn = document.getElementById('uploadTabBtn');
             const generateBtn = document.getElementById('generateTabBtn');
             
-            if (tab === 'upload') {
+            if (tab === 'gallery') {
+                if (galleryTab) galleryTab.style.display = 'block';
+                if (uploadTab) uploadTab.style.display = 'none';
+                if (generateTab) generateTab.style.display = 'none';
+                if (galleryBtn) {
+                    galleryBtn.style.background = '#667eea';
+                    galleryBtn.style.color = 'white';
+                    galleryBtn.style.fontWeight = 'bold';
+                }
+                if (uploadBtn) {
+                    uploadBtn.style.background = '#f0f0f0';
+                    uploadBtn.style.color = '#333';
+                    uploadBtn.style.fontWeight = 'normal';
+                }
+                if (generateBtn) {
+                    generateBtn.style.background = '#f0f0f0';
+                    generateBtn.style.color = '#333';
+                    generateBtn.style.fontWeight = 'normal';
+                }
+                // Hide generate button if in gallery
+                document.getElementById('generateImageButton').style.display = 'none';
+            } else if (tab === 'upload') {
+                if (galleryTab) galleryTab.style.display = 'none';
                 if (uploadTab) uploadTab.style.display = 'block';
                 if (generateTab) generateTab.style.display = 'none';
                 if (uploadBtn) {
@@ -4993,12 +6528,18 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                     generateBtn.style.color = '#333';
                     generateBtn.style.fontWeight = 'normal';
                 }
+                if (galleryBtn) {
+                    galleryBtn.style.background = '#f0f0f0';
+                    galleryBtn.style.color = '#333';
+                    galleryBtn.style.fontWeight = 'normal';
+                }
                 // Hide generate button, show insert button if image is uploaded
                 document.getElementById('generateImageButton').style.display = 'none';
                 if (generatedImageData) {
                     document.getElementById('insertImageButton').style.display = 'inline-block';
                 }
             } else {
+                if (galleryTab) galleryTab.style.display = 'none';
                 if (uploadTab) uploadTab.style.display = 'none';
                 if (generateTab) generateTab.style.display = 'block';
                 if (generateBtn) {
@@ -5010,6 +6551,11 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                     uploadBtn.style.background = '#f0f0f0';
                     uploadBtn.style.color = '#333';
                     uploadBtn.style.fontWeight = 'normal';
+                }
+                if (galleryBtn) {
+                    galleryBtn.style.background = '#f0f0f0';
+                    galleryBtn.style.color = '#333';
+                    galleryBtn.style.fontWeight = 'normal';
                 }
                 // Show appropriate button
                 document.getElementById('generateImageButton').style.display = generatedImageData ? 'none' : 'inline-block';
@@ -5044,6 +6590,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             document.getElementById('imageGenDialog').style.display = 'none';
             generatedImageData = null;
             selectedImageFiles = [];
+            window.imageReplacementTarget = null; // Clear replacement target
             
             // Clean up tabs if they exist
             const tabs = document.querySelector('.image-tabs');
@@ -5395,13 +6942,17 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 // Store the generated image data
                 generatedImageData = imageUrl;
                 
+                // Save to media gallery (async but don't wait)
+                saveGeneratedImage(imageUrl, prompt).catch(e => console.error('Failed to save image to gallery:', e));
+                
                 // Show the generated image
                 document.getElementById('generatedImagePreview').src = imageUrl;
                 document.getElementById('imageGenResult').style.display = 'block';
                 document.getElementById('imageGenLoading').style.display = 'none';
                 document.getElementById('insertImageButton').style.display = 'inline-block';
                 
-                showMessage('assistant', '🎨 Image generated successfully! You can now insert it into your design.');
+                showToast('Image generated and saved to gallery!', 3000);
+                showMessage('assistant', 'You can now insert the image into your design.');
                 
             } catch (error) {
                 console.error('Image generation error:', error);
@@ -5422,10 +6973,15 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 return;
             }
             
+            // Make sure we're using the latest HTML from the editor
+            currentHTML = document.getElementById('htmlEditor').value || currentHTML;
+            
             // Find all placeholder images in the current HTML
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = currentHTML;
             const placeholderImages = tempDiv.querySelectorAll('img[src*="placeholder.com"], img[data-image-prompt]');
+            
+            console.log(`Found ${placeholderImages.length} placeholder images to replace`);
             
             if (placeholderImages.length === 0) {
                 if (!skipConfirm) {
@@ -5440,16 +6996,13 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 if (!confirmGenerate) return;
             }
             
-            showMessage('assistant', `🎨 Starting to generate ${placeholderImages.length} images...`);
+            showMessage('assistant', `Starting to generate ${placeholderImages.length} images in parallel...`);
             
             const imagePromptTemplate = document.getElementById('imagePromptTemplate')?.value || 
                 'Professional photography, high quality, 8k resolution, {description}, modern aesthetic';
             
-            let successCount = 0;
-            let failCount = 0;
-            
-            for (let i = 0; i < placeholderImages.length; i++) {
-                const img = placeholderImages[i];
+            // Create an array of image generation promises
+            const imageGenerationPromises = Array.from(placeholderImages).map(async (img, i) => {
                 const placeholderSrc = img.src;
                 
                 // Extract description from various sources
@@ -5473,8 +7026,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 
                 if (!description) {
                     console.log(`Skipping image ${i + 1}: No description found`);
-                    failCount++;
-                    continue;
+                    return { success: false, error: 'No description', img, placeholderSrc };
                 }
                 
                 // Build the prompt using the template
@@ -5483,6 +7035,9 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 showMessage('assistant', `📸 Generating image ${i + 1}/${placeholderImages.length}: ${description.substring(0, 50)}...`);
                 
                 try {
+                    // Add a small random delay to stagger requests slightly (0-500ms)
+                    await new Promise(resolve => setTimeout(resolve, Math.random() * 500));
+                    
                     // Generate the image
                     const requestBody = imageGenModel.includes('dall-e') ? {
                         model: imageGenModel,
@@ -5523,12 +7078,12 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                         
                         // Check for images array first (new format when using modalities: ['image'])
                         if (choice.message && choice.message.images && Array.isArray(choice.message.images)) {
-                            for (const img of choice.message.images) {
-                                if (img.image_url && img.image_url.url) {
-                                    imageUrl = img.image_url.url;
+                            for (const imgData of choice.message.images) {
+                                if (imgData.image_url && imgData.image_url.url) {
+                                    imageUrl = imgData.image_url.url;
                                     break;
-                                } else if (img.url) {
-                                    imageUrl = img.url;
+                                } else if (imgData.url) {
+                                    imageUrl = imgData.url;
                                     break;
                                 }
                             }
@@ -5551,29 +7106,82 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                     }
                     
                     if (imageUrl) {
-                        // Update the image in HTML
-                        const imgInHTML = currentHTML.includes(placeholderSrc) ? placeholderSrc : img.outerHTML;
-                        currentHTML = currentHTML.replace(imgInHTML, img.outerHTML.replace(placeholderSrc, imageUrl));
-                        successCount++;
+                        // Save to media gallery (async but don't wait)
+                        saveGeneratedImage(imageUrl, imagePrompt).catch(e => console.error('Failed to save image to gallery:', e));
+                        return { success: true, imageUrl, img, placeholderSrc };
                     } else {
-                        failCount++;
+                        return { success: false, error: 'No image URL found', img, placeholderSrc };
                     }
                     
                 } catch (error) {
                     console.error(`Failed to generate image ${i + 1}:`, error);
+                    return { success: false, error: error.message, img, placeholderSrc };
+                }
+            });
+            
+            // Wait for all image generations to complete
+            const results = await Promise.all(imageGenerationPromises);
+            
+            // Process results and update HTML
+            let successCount = 0;
+            let failCount = 0;
+            
+            for (const result of results) {
+                if (result.success) {
+                    // Create a regex to find the image with this placeholder src
+                    const placeholderSrc = result.placeholderSrc;
+                    const imageUrl = result.imageUrl;
+                    
+                    // Escape special regex characters in the URL
+                    const escapedSrc = placeholderSrc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    
+                    // Try multiple replacement patterns
+                    // Pattern 1: Direct src attribute replacement
+                    const srcPattern = new RegExp(`src=["']${escapedSrc}["']`, 'gi');
+                    if (srcPattern.test(currentHTML)) {
+                        currentHTML = currentHTML.replace(srcPattern, `src="${imageUrl}"`);
+                        successCount++;
+                        console.log(`Replaced placeholder: ${placeholderSrc.substring(0, 50)}...`);
+                    } 
+                    // Pattern 2: Look for the full img tag with this src
+                    else {
+                        const imgTagPattern = new RegExp(`<img[^>]*src=["']${escapedSrc}["'][^>]*>`, 'gi');
+                        if (imgTagPattern.test(currentHTML)) {
+                            currentHTML = currentHTML.replace(imgTagPattern, (match) => {
+                                return match.replace(placeholderSrc, imageUrl);
+                            });
+                            successCount++;
+                            console.log(`Replaced img tag with placeholder: ${placeholderSrc.substring(0, 50)}...`);
+                        } else {
+                            console.warn(`Could not find placeholder in HTML: ${placeholderSrc.substring(0, 50)}...`);
+                            failCount++;
+                        }
+                    }
+                } else {
                     failCount++;
                 }
-                
-                // Small delay between requests to avoid rate limiting
-                await new Promise(resolve => setTimeout(resolve, 1000));
             }
             
             // Update the editors and preview
-            document.getElementById('htmlEditor').value = currentHTML;
-            updatePreview();
-            generateOxygenJSON();
+            if (successCount > 0) {
+                // Update the HTML editor with replaced images
+                document.getElementById('htmlEditor').value = currentHTML;
+                
+                // IMPORTANT: Update the global currentHTML variable
+                window.currentHTML = currentHTML;
+                
+                // Refresh the preview to show the new images
+                updatePreview();
+                generateOxygenJSON();
+                
+                console.log(`Successfully replaced ${successCount} placeholder images`);
+                console.log('Updated HTML:', currentHTML.substring(0, 500) + '...');
+            } else if (placeholderImages.length > 0) {
+                console.error('Failed to replace any placeholder images');
+                console.log('Current HTML sample:', currentHTML.substring(0, 500) + '...');
+            }
             
-            showMessage('assistant', `✅ Image generation complete! Successfully generated ${successCount} image(s)${failCount > 0 ? `, ${failCount} failed` : ''}.`);
+            showToast(`✅ Image generation complete! ${successCount} image(s) generated${failCount > 0 ? `, ${failCount} failed` : ''}`, 3000);
         }
         
         function insertGeneratedImage() {
@@ -5582,8 +7190,55 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 return;
             }
             
-            const insertType = document.getElementById('imageInsertType').value;
-            const prompt = document.getElementById('imagePrompt').value;
+            // Check if we're replacing an existing image element
+            if (window.imageReplacementTarget) {
+                const target = window.imageReplacementTarget;
+                
+                // Replace the image src directly in the iframe
+                if (target.tagName === 'IMG') {
+                    // Store original dimensions if they exist
+                    const originalStyle = target.getAttribute('style') || '';
+                    const originalWidth = target.getAttribute('width') || '';
+                    const originalHeight = target.getAttribute('height') || '';
+                    
+                    // Replace the src
+                    target.src = generatedImageData;
+                    
+                    // Preserve original styling if it exists
+                    if (originalStyle && !originalStyle.includes('max-width')) {
+                        target.setAttribute('style', originalStyle);
+                    } else if (originalWidth || originalHeight) {
+                        // Keep original dimensions if specified
+                        if (originalWidth) target.setAttribute('width', originalWidth);
+                        if (originalHeight) target.setAttribute('height', originalHeight);
+                    }
+                    
+                    // Update the HTML editor to reflect the change
+                    const iframeDoc = document.getElementById('previewFrame').contentDocument;
+                    const bodyHTML = iframeDoc.body.innerHTML;
+                    
+                    // Update currentHTML with the new content
+                    currentHTML = bodyHTML;
+                    document.getElementById('htmlEditor').value = currentHTML;
+                    
+                    // Clear the replacement target
+                    window.imageReplacementTarget = null;
+                    
+                    // Close dialog and show success
+                    closeImageGenDialog();
+                    showToast('✅ Image replaced successfully!', 2000);
+                    return;
+                }
+            }
+            
+            // Original insertion logic for non-replacement cases
+            // Get insert type, default to 'img' if not found (when using from context menu)
+            const insertTypeEl = document.getElementById('imageInsertType');
+            const insertType = insertTypeEl ? insertTypeEl.value : 'img';
+            
+            // Get prompt, use empty string if not found
+            const promptEl = document.getElementById('imagePrompt');
+            const prompt = promptEl ? promptEl.value : 'Generated image';
             
             let newHTML = '';
             let newCSS = '';
@@ -5656,7 +7311,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             closeImageGenDialog();
             
             // Show success message
-            showMessage('assistant', `✅ Generated image inserted as ${insertType === 'img' ? 'an image element' : insertType === 'background' ? 'a background image' : 'a hero section'}!`);
+            showToast(`✅ Image inserted as ${insertType === 'img' ? 'an image element' : insertType === 'background' ? 'a background image' : 'a hero section'}!`, 3000);
         }
         
         async function sendMessageWithImage(imageData, customPrompt = null) {
@@ -5682,6 +7337,13 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                 showMessage('user', '📸 ' + userMessage + ' [Screenshot attached]');
             }
             
+            // Ensure image is compressed before sending (safety check)
+            let compressedImageData = imageData;
+            if (imageData.startsWith('data:image/png') || imageData.length > 500000) {
+                // Compress if it's PNG or larger than ~500KB
+                compressedImageData = await compressAndResizeImage(imageData, 1024, 1024, 0.85);
+            }
+            
             // Add to conversation history with image
             const messageWithImage = {
                 role: 'user',
@@ -5693,7 +7355,7 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
                     {
                         type: 'image_url',
                         image_url: {
-                            url: imageData
+                            url: compressedImageData
                         }
                     }
                 ]
@@ -5756,7 +7418,10 @@ When analyzing screenshots, identify issues and provide improved code.`
                 parseAIResponse(aiResponse, previousHTML, previousCSS, currentJS);
                 
                 // Show AI message
-                showMessage('assistant', '🎨 ' + aiResponse.split('[HTML]')[0].replace('[EXPLANATION]', '').trim());
+                const explanation = aiResponse.split('[HTML]')[0].replace('[EXPLANATION]', '').trim();
+                if (explanation) {
+                    showMessage('assistant', explanation);
+                }
                 
             } catch (error) {
                 showMessage('assistant', `Error: ${error.message}`);
