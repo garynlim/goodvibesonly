@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vibe Coder - AI-Powered Oxygen Builder</title>
+    <title>Good Vibes Only - AI-Powered Website Builder</title>
     <style>
         * {
             margin: 0;
@@ -793,7 +793,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>✨ Vibe Coder <span style="font-size: 14px; opacity: 0.8;">for Oxygen Builder</span></h1>
+        <h1>✨ Good Vibes Only<span style="font-size: 14px; opacity: 0.8;">for Oxygen Builder</span></h1>
         <p>Chat with AI to create beautiful websites - Export directly to Oxygen Builder</p>
     </div>
 
@@ -928,6 +928,12 @@ IMPORTANT IMAGE HANDLING:
                         </button>
                     </div>
                     <button class="clear-chat-button" onclick="clearAll()" title="Clear conversation history">Clear chat</button>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+                        <input type="checkbox" id="autoGenerateImages" style="width: 16px; height: 16px; cursor: pointer;">
+                        <label for="autoGenerateImages" style="font-size: 13px; color: #71717a; cursor: pointer; user-select: none;">
+                            🎨 Auto-generate images for all placeholders
+                        </label>
+                    </div>
                 </div>
                 <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
             </div>
@@ -980,7 +986,6 @@ IMPORTANT IMAGE HANDLING:
             <div class="controls">
                 <button class="control-button" onclick="screenshotWithPrompt()" id="screenshotBtn" style="display: none;">📸 Screenshot</button>
                 <button class="control-button" onclick="showImageGenerationDialog()" id="generateImageBtn" style="display: none;">🎨 Generate Image</button>
-                <button class="control-button" onclick="autoGeneratePlaceholderImages()" id="autoGenerateBtn" style="display: none;">🎨 Auto-Generate All Images</button>
                 <button class="control-button" onclick="showMemoryDialog()">📜 History</button>
                 <button class="control-button" onclick="toggleEditMode()" id="manualEditModeBtn">✏️ Manual Edit Mode</button>
                 <button class="control-button primary" onclick="exportToOxygen()">📤 Export to Oxygen</button>
@@ -1352,6 +1357,7 @@ IMPORTANT IMAGE HANDLING:
             const savedSystemPrompt = localStorage.getItem('vibe_system_prompt');
             const savedBrandGuidelines = localStorage.getItem('vibe_brand_guidelines');
             const savedImagePromptTemplate = localStorage.getItem('vibe_image_prompt_template');
+            const savedAutoGenerate = localStorage.getItem('vibe_auto_generate_images');
             
             if (savedKey) {
                 document.getElementById('apiKey').value = savedKey;
@@ -1377,6 +1383,22 @@ IMPORTANT IMAGE HANDLING:
             }
             if (savedImagePromptTemplate) {
                 document.getElementById('imagePromptTemplate').value = savedImagePromptTemplate;
+            }
+            
+            // Load auto-generate images checkbox state
+            if (savedAutoGenerate !== null) {
+                const autoGenCheckbox = document.getElementById('autoGenerateImages');
+                if (autoGenCheckbox) {
+                    autoGenCheckbox.checked = savedAutoGenerate === 'true';
+                }
+            }
+            
+            // Add event listener to save checkbox state when changed
+            const autoGenCheckbox = document.getElementById('autoGenerateImages');
+            if (autoGenCheckbox) {
+                autoGenCheckbox.addEventListener('change', function() {
+                    localStorage.setItem('vibe_auto_generate_images', this.checked.toString());
+                });
             }
             
             // Load conversation memory
@@ -2851,6 +2873,15 @@ Remember: In ADD MODE return ONLY new content, in EDIT MODE return COMPLETE code
             // Update preview and generate JSON
             updatePreview();
             generateOxygenJSON();
+            
+            // Check if auto-generate images is enabled
+            const autoGenCheckbox = document.getElementById('autoGenerateImages');
+            if (autoGenCheckbox && autoGenCheckbox.checked) {
+                // Wait a moment for preview to render, then auto-generate images
+                setTimeout(() => {
+                    autoGeneratePlaceholderImages();
+                }, 1000);
+            }
         }
         
         function mergeHTML(existingHTML, newHTML) {
